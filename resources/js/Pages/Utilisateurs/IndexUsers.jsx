@@ -393,7 +393,7 @@ export default function IndexUsers({ auth,AccessTable, documents,users, flash })
                                             title="Ajouter un nouveau utilisateur"
                                             className="px-2 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
                                         >
-                                            <IoPersonAddOutline />{/*Ajouter un utilisateur*/}
+                                            <IoPersonAddOutline /> {/*Ajouter un utilisateur*/}
                                         </button>
                                     </div> :
                                     <div className="flex space-x-3">
@@ -430,7 +430,7 @@ export default function IndexUsers({ auth,AccessTable, documents,users, flash })
                                                 title="Ajouter un nouveau utilisateur"
                                                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
                                             >
-                                                <IoPersonAddOutline/>{/*Ajouter un utilisateur*/}
+                                                <span className="flex justify-center items-center"><IoPersonAddOutline/>&nbsp; Nouveau Utilisateur{/*Ajouter un utilisateur*/}</span>
                                             </button>
                                         </div>
                                 }

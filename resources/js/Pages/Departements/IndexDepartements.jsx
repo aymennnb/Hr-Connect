@@ -131,7 +131,6 @@ export default function IndexDepartment({ auth, departements, users, flash }) {
         post(route('departements.bulkDelete'), {
             onSuccess: () => {
                 setData("departements_ids", []);
-                toast.success("Départements supprimés avec succès.");
             },
             onError: () => {
                 toast.error("Erreur lors de la suppression des départements.");
@@ -148,16 +147,7 @@ export default function IndexDepartment({ auth, departements, users, flash }) {
 
     const confirmDelete = () => {
         if (!departementToDelete) return;
-
-        destroy(route('departements.delete', departementToDelete.id), {
-            onSuccess: () => {
-                toast.success("Département supprimé avec succès.");
-            },
-            onError: () => {
-                toast.error("Erreur lors de la suppression du département.");
-            }
-        });
-
+        destroy(route('departements.delete', departementToDelete.id));
         setIsModalOpen(false);
         setDepartementToDelete(null);
     };

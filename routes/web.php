@@ -85,7 +85,7 @@ Route::middleware(['auth','verified'])->group(function () {
                 Route::post('create', 'create')->name('departements.create');
                 Route::get('edit/{id}', 'edit')->name('departements.edit');
                 Route::post('update', 'update')->name('departements.update');
-                Route::delete('delete/{id}', 'delete');
+                Route::delete('delete/{id}', 'delete')->name('departements.delete');
                 Route::post('departements-delete', 'bulkDelete')->name('departements.bulkDelete');
             });
             

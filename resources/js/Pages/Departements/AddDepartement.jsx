@@ -6,14 +6,13 @@ export default function AddDepartement({ setShowAddForm }) {
     const { data, setData, post, processing, errors } = useForm({
         name: "",
         description: "",
-        // uploaded_by: auth.user.id   
     });
 
     const Width = useWindowWidth();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("departement.create"), {
+        post(route("departements.create"), {
             onSuccess: () => {
                 setShowAddForm(false);
             },
@@ -25,11 +24,11 @@ export default function AddDepartement({ setShowAddForm }) {
             <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div className="p-6 bg-white border-b border-gray-200">
-                        <h3 className="text-lg font-medium mb-4">Ajouter un nouveau département</h3>
+                        <h3 className="text-lg font-medium mb-4">Fournir les informations suivantes</h3>
                         <div className="h-96 overflow-y-auto p-2">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="mb-6">
-                                    <label htmlFor="nom" className="block text-gray-700 text-sm font-bold mb-2">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                                         Nom du département
                                     </label>
                                     <input
@@ -44,7 +43,7 @@ export default function AddDepartement({ setShowAddForm }) {
                                 </div>
 
                                 <div className="mb-6">
-                                    <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
                                         Description
                                     </label>
                                     <textarea
@@ -69,7 +68,7 @@ export default function AddDepartement({ setShowAddForm }) {
                                     <button
                                         type="submit"
                                         disabled={processing}
-                                        className={`px-6 py-2 bg-[#2563eb] text-white rounded-md hover:bg-[#1d4ed8] focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:ring-offset-2 transition-colors ${
+                                        className={`px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors ${
                                             processing ? "opacity-75 cursor-not-allowed" : ""
                                         }`}
                                     >

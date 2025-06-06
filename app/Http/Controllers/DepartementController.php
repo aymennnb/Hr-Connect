@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DepartementRequest;
+use App\Http\Requests\DepartementUpdateRequest;
 use App\Models\Departement;
 use App\Models\Alerts;
 use App\Models\User;
@@ -30,8 +31,7 @@ class DepartementController extends Controller
         $departement = Departement::create([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
-            'uploaded_by' => $validated['uploaded_by'],
-            'created_by' => Auth::id()
+            'uploaded_by' => Auth::id(),
         ]);
 
         Alerts::create([
@@ -39,11 +39,10 @@ class DepartementController extends Controller
             'role' => Auth::user()->role,
             'action' => 'add',
             'type' => 'departement',
-            'message' => "a ajouté un nouveau département : {$departement->name} (ID: {$departement->id})"
+            'message' => "a ajouté un nouveau département {$departement->name} ."
         ]);
 
-        return redirect()->route('departements.index')
-            ->with(['success' => "Le département {$departement->name} a été créé."]);
+        return redirect()->route('departements')->with(['success' => "Le département {$departement->name} a été créé avec succès."]);
     }
 
     public function edit($id)
@@ -55,14 +54,15 @@ class DepartementController extends Controller
         ]);
     }
 
-    public function update(DepartementRequest $request, $id)
+    public function update(DepartementUpdateRequest $request)
     {
         $validated = $request->validated();
 
-        $departement = Departement::findOrFail($id);
+        $departement = Departement::findOrFail($request->id);
+
         $departement->update([
             'name' => $validated['name'],
-            'description' => $validated['description'] ?? null
+            'description' => $validated['description']
         ]);
 
         Alerts::create([
@@ -70,12 +70,12 @@ class DepartementController extends Controller
             'role' => Auth::user()->role,
             'action' => 'update',
             'type' => 'departement',
-            'message' => "a mis à jour le département : {$departement->name} (ID: {$departement->id})"
+            'message' => "a mis à jour le département {$departement->name} avec l'ID {$departement->id}"
         ]);
 
-        return redirect()->route('departements.index')
-            ->with(['success' => "Le département {$departement->name} a été mis à jour."]);
+        return redirect()->route('departements')->with(['success' => "Le département {$departement->name} a été mis à jour avec succès."]);
     }
+
 
     public function delete($id)
     {
@@ -89,19 +89,18 @@ class DepartementController extends Controller
             'role' => Auth::user()->role,
             'action' => 'delete',
             'type' => 'departement',
-            'message' => "a supprimé le département : {$name} (ID: {$id})"
+            'message' => "a supprimé le département {$name} avec l'ID {$departement->id}"
         ]);
 
-        return redirect()->route('departements.index')
-            ->with(['success' => "Le département {$name} a été supprimé."]);
+        return redirect()->route('departements')->with(['success' => "Le département {$name} a été supprimé avec succès"]);
     }
 
     public function bulkDelete(Request $request)
     {
-        $ids = $request->input('departement_ids', []);
-
+        $ids = $request->departements_ids;
+        
         if (empty($ids)) {
-            return back()->with(['error' => 'Aucun département sélectionné.']);
+            return back()->with(['error' => 'Aucun département sélectionné']);
         }
 
         foreach ($ids as $id) {
@@ -115,11 +114,11 @@ class DepartementController extends Controller
                     'role' => Auth::user()->role,
                     'action' => 'delete',
                     'type' => 'departement',
-                    'message' => "a supprimé le département : {$name} (ID: {$id})"
+                    'message' => "a supprimé le département {$name} avec l'ID {$id}"
                 ]);
             }
         }
 
-        return back()->with(['success' => 'Les départements sélectionnés ont été supprimés.']);
+        return back()->with(['success' => 'Les départements sélectionnés ont été supprimés avec succès']);
     }
 }

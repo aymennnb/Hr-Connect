@@ -193,10 +193,9 @@ export default function IndexPublic({ auth, conges, users, flash }) {
                             <button
                                 onClick={() => setShowAddForm(true)}
                                 title="Demander un nouveau congé"
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center"
+                                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
                             >
-                                <BsPlusCircle className="mr-2" />
-                                <span>Nouvelle Demande</span>
+                                <span className="flex justify-center items-center"><BsPlusCircle className="mr-2" />&nbsp; Nouvelle Demande</span>
                             </button>
                         </div>
 
