@@ -145,32 +145,18 @@ export default function Authenticated({ user, header, children }) {
                         </div>
                         }
                     </NavLink>
-
-                    {/* Menu spécifique aux employés (user) */}
-                    {user.role === "user" && (
-                        <>                           
-                            <NavLink href={route("dashboard")} >
-                                <div className="flex text-blue-600 items-center gap-2">
-                                    <FaRegCalendarAlt style={{ color: colors.primary }} />
-                                    <span>Mes congés</span>
-                                </div>
-                            </NavLink>
-                            <NavLink href={route("dashboard")} >
-                                <div className="flex text-blue-600 items-center gap-2">
-                                    <FaRegCalendarAlt style={{ color: colors.primary }} />
-                                    <span>Mes salaires</span>
-                                </div>
-                            </NavLink>
-                            
-                            <NavLink href={route("dashboard")} >
-                                <div className="flex text-blue-600 items-center gap-2">
-                                    <FaFileAlt style={{ color: colors.primary }} />
-                                    <span>Mes documents</span>
-                                </div>
-                            </NavLink>
-                            {/* active={route().current("dashboard")} */}
-                        </>
-                    )}
+                    <NavLink href={route("conges.public")} active={route().current("conges.public")} >
+                            <div className="flex text-blue-600 items-center gap-2">
+                                <FaRegCalendarAlt style={{ color: colors.primary }} />
+                                <span>Mes congés</span>
+                            </div>
+                    </NavLink>
+                    <NavLink href={route("dashboard")} active={route().current("conges")} >
+                            <div className="flex text-blue-600 items-center gap-2">
+                                <FaRegCalendarAlt style={{ color: colors.primary }} />
+                                <span>Mes salaires</span>
+                            </div>
+                    </NavLink>
 
                     {/* Menu pour admin/manager/superadmin */}
                     {(user.role === "admin" || user.role === "manager" || user.role === "superadmin") && (

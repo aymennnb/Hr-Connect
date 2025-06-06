@@ -41,12 +41,13 @@ Route::middleware(['auth','verified'])->group(function () {
     });
 
     Route::prefix('conges')->controller(CongeController::class)->group(function () {
-        Route::get('/', 'index')->name('conges');
+        Route::get('/mes-conges', 'indexpublic')->name('conges.public');
         Route::inertia('add', 'Conges/AddConge')->name('conges.add');
         Route::post('create', 'store')->name('conges.create');
         Route::get('edit/{id}', 'edit')->name('conges.edit');
         Route::post('update', 'update')->name('conges.update');
-        Route::delete('delete/{id}', 'destroy')->name('conges.delete');
+        Route::delete('delete/{id}', 'delete')->name('conges.delete');
+        Route::post('cancel/{id}', 'cancel')->name('conges.cancel');
     });
 
     Route::middleware('CheckRole:manager,admin,superadmin')->group(function () {
@@ -89,7 +90,7 @@ Route::middleware(['auth','verified'])->group(function () {
             });
             
             Route::prefix('conges')->controller(CongeController::class)->group(function () {
-                // Routes spécifiques pour accepter/refuser un congé
+                Route::get('/', 'index')->name('conges');
                 Route::post('accept/{id}', 'accept')->name('conges.accept');
                 Route::post('refuse/{id}', 'refuse')->name('conges.refuse');
             });

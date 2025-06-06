@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CongeRequest;
+use App\Http\Requests\CongeUpdateRequest;
 use App\Models\Conge;
 use App\Models\User;
 use App\Models\Alerts;
@@ -13,102 +15,140 @@ class CongeController extends Controller
 {
     public function index()
     {
-        $conges = Conge::with('user')->latest()->get();
+        $currentUser = Auth::user();
+
+        if ($currentUser->role === 'superadmin') {
+            $conges = Conge::with('user')->latest()->get();
+        } else {
+            $conges = Conge::with('user')
+                ->whereHas('user', function ($query) {
+                    $query->whereNotIn('role', ['superadmin', 'admin', 'manager']);
+                })
+                ->latest()
+                ->get();
+        }
+
         return Inertia::render('Conges/IndexConges', ['conges' => $conges]);
     }
 
-    public function store(Request $request)
+    public function store(CongeRequest $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'motif' => 'required|string',
-            'date_debut' => 'required|date',
-            'date_fin' => 'required|date|after_or_equal:date_debut',
-            'commentaire' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
-        $conge = Conge::create($request->all());
+        $conge = new Conge();
+
+        $conge->user_id = Auth::id();
+        $conge->motif = $validated['motif'];
+        $conge->date_debut = $validated['date_debut'];
+        $conge->date_fin = $validated['date_fin'];
+        $conge->commentaire = $validated['commentaire'] ?? null;
+
+        $conge->save();
 
         Alerts::create([
             'user_id' => Auth::id(),
             'role' => Auth::user()->role,
             'action' => 'add',
-            'type' => 'conge',
-            'message' => "a demandé un congé (ID: {$conge->id}) du {$conge->date_debut} au {$conge->date_fin} pour le motif : {$conge->motif}"
+            'type' => 'conges',
+            'message' => "a demandé un congé du {$conge->date_debut} au {$conge->date_fin}",
         ]);
 
-        return back()->with('success', 'Congé ajouté avec succès.');
+        return redirect()->route('conges.public')->with('success', 'Demande de congé enregistrée avec succès.');
     }
 
-    public function update(Request $request, Conge $conge)
+    public function update(CongeUpdateRequest $request)
     {
-        $request->validate([
-            'motif' => 'required|string',
-            'date_debut' => 'required|date',
-            'date_fin' => 'required|date|after_or_equal:date_debut',
-            'commentaire' => 'nullable|string',
-        ]);
+        $item = Conge::find($request->id);
 
-        $conge->update($request->all());
+        if (!$item) {
+            return redirect()->route('conges')->with(['error' => 'Congé non trouvé.']);
+        }
+
+        $item->motif = $request->motif;
+        $item->date_debut = $request->date_debut;
+        $item->date_fin = $request->date_fin;
+        $item->commentaire = $request->commentaire;
+        $item->user_id = $request->user_id;
+        $item->save();
 
         Alerts::create([
             'user_id' => Auth::id(),
             'role' => Auth::user()->role,
-            'action' => 'edit',
-            'type' => 'conge',
-            'message' => "a modifié le congé (ID: {$conge->id}) du {$conge->date_debut} au {$conge->date_fin}"
+            'action' => 'update',
+            'type' => 'conges',
+            'message' => "a modifié les informations d'un congé avec l'ID {$item->id}.",
         ]);
 
-        return back()->with('success', 'Congé modifié.');
+        return redirect()->route('conges.public')->with(['success' => 'Le congé a été mis à jour avec succès.']);
     }
 
-    public function accept(Conge $conge)
+    public function accept($id)
     {
+        $conge = Conge::findOrFail($id);
         $conge->update(['status' => 'accepte']);
+
+        $user = User::find($conge->user_id);
+        $userName = $user?->name ?? 'Utilisateur inconnu';
 
         Alerts::create([
             'user_id' => Auth::id(),
             'role' => Auth::user()->role,
             'action' => 'accept',
-            'type' => 'conge',
-            'message' => "a accepté le congé (ID: {$conge->id}) demandé par {$conge->user->name}"
+            'type' => 'conges',
+            'message' => "a accepté le congé demandé par {$userName} dont l'ID est {$conge->id}."
         ]);
 
-        return back()->with('success', 'Congé accepté.');
+        return redirect()->route('conges')->with(['success'=> 'Congé accepté avec succès.']);
     }
 
-    public function refuse(Conge $conge)
+    public function refuse($id)
     {
+        $conge = Conge::findOrFail($id);
         $conge->update(['status' => 'refuse']);
+
+        $user = User::find($conge->user_id);
+        $userName = $user?->name ?? 'Utilisateur inconnu';
 
         Alerts::create([
             'user_id' => Auth::id(),
             'role' => Auth::user()->role,
             'action' => 'refuse',
-            'type' => 'conge',
-            'message' => "a refusé le congé (ID: {$conge->id}) demandé par {$conge->user->name}"
+            'type' => 'conges',
+            'message' => "a refusé le congé demandé par {$userName} dont l'ID est {$conge->id}."
         ]);
 
-        return back()->with('success', 'Congé refusé.');
+        return redirect()->route('conges')->with(['success'=> 'Congé refusé avec succès.']);
     }
 
-    public function destroy(Conge $conge)
+    public function delete($id)
     {
-        $id = $conge->id;
-        $nom = $conge->user->name;
-        $dates = "{$conge->date_debut} → {$conge->date_fin}";
+        $conge = Conge::where('id', $id)->first();
+
+        if (!$conge) {
+            return redirect()->route('conges.public')->with(['error' => 'Congé non trouvé.']);
+        }
+
+        if ($conge->user_id !== auth()->id()) {
+            abort(403);
+        }
 
         $conge->delete();
 
         Alerts::create([
-            'user_id' => Auth::id(),
-            'role' => Auth::user()->role,
+            'user_id' => auth()->user()->id,
+            'role' => auth()->user()->role,
             'action' => 'delete',
-            'type' => 'conge',
-            'message' => "a supprimé le congé (ID: {$id}) de {$nom} prévu du {$dates}"
+            'type' => 'conges',
+            'message' => "a annulé une demande de congé du {$conge->date_debut} au {$conge->date_fin} dont l'ID est {$conge->id}.",
         ]);
 
-        return back()->with('success', 'Congé supprimé.');
+        return redirect()->route('conges.public')->with(['success' => "Le congé a été annulé avec succès."]);
+    }
+
+    public function indexpublic() 
+    {
+        $users = User::all();
+        $conges = Conge::all();
+        return Inertia::render('Conges/IndexPublic', ['conges' => $conges,'users'=>$users]);
     }
 }
-

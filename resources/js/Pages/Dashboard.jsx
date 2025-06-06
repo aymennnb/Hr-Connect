@@ -76,7 +76,7 @@ export default function Dashboard({
     // Traduction des statuts avec mise en forme cohérente
     const statusLabels = {
       'en_attente': 'En attente',
-      'accepte': 'Approuvé',
+      'accepte': 'Accepté',
       'refuse': 'Refusé'
     };
     

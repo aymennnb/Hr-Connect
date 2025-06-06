@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Head, Link, router, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, router } from "@inertiajs/react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import toast from 'react-hot-toast';
 import { TbPlayerTrackNextFilled, TbZoomReset } from "react-icons/tb";
@@ -7,58 +7,68 @@ import { FaBackward } from "react-icons/fa6";
 import { BiEdit } from "react-icons/bi";
 import { BsPlusCircle } from "react-icons/bs";
 import { useWindowWidth } from "@/hooks/useWindowWidth.js";
-import MultiSelectDropdown from "@/Components/MultiSelectDropdown";
-import EditConges from "./EditConges";
 import ModalWrapper from "@/Components/ModalWrapper";
 import AddConges from "./AddConges";
-import { MdOutlineDone } from "react-icons/md";
+import EditConges from "./EditConges";
+import { MdOutlineDone, MdOutlineCancel } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
 import ConfirmCongeAction from "@/Components/ConfirmCongeAction";
+import ConfirmCongeAnnuler from "@/Components/ConfirmCongeAnnuler";
 
-
-export default function IndexConges({ auth, conges, users, flash }) {
-    const { data, setData, post } = useForm({
-        conges_ids: [],
+export default function IndexPublic({ auth, conges, users, flash }) {
+    const { data, setData } = useForm({
         searchTerm: '',
         motif: '',
         status: '',
         start_date: '',
-        end_date: '',
-        user_id: ''
+        end_date: ''
     });
 
     const width = useWindowWidth();
-
     const [showAddForm, setShowAddForm] = useState(false);
-
-    // Pagination
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [filteredConges, setFilteredConges] = useState([]);
-
-    const [selectedUsers, setSelectedUsers] = useState([]);
-
     const [showEditForm, setShowEditForm] = useState(false);
     const [congeToEdit, setCongeToEdit] = useState(null);
-
     const [modalConge, setModalConge] = useState({ isOpen: false, conge: null, action: '' });
+
+    const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+    const [congeToDelete, setCongeToDelete] = useState(null);
+
+    // Filtrer pour n'afficher que les congés de l'utilisateur connecté
+    const myConges = conges.filter(conge => conge.user_id === auth.user.id);
 
     const resetFilters = () => {
         setData({
-            ...data,
             searchTerm: '',
             motif: '',
             status: '',
             start_date: '',
-            end_date: '',
-            user_id: ''
+            end_date: ''
         });
-        setSelectedUsers([]);
         setCurrentPage(1);
     };
 
     const openCongeModal = (conge, action) => {
-    setModalConge({ isOpen: true, conge, action });
+        setModalConge({ isOpen: true, conge, action });
+    };
+
+    const openDeleteConfirm = (conge) => {
+        setCongeToDelete(conge);
+        setShowConfirmDelete(true);
+    };
+    
+    const handleConfirmDelete = () => {
+        router.delete(route('conges.delete', { id: conge.id }), {
+            onSuccess: () => {
+                toast.success("Congé supprimé avec succès");
+            },
+            onError: () => {
+                toast.error("Erreur lors de la suppression du congé");
+            }
+        });
+        setShowModal(false);
     };
 
     const closeCongeModal = () => {
@@ -68,37 +78,42 @@ export default function IndexConges({ auth, conges, users, flash }) {
     const confirmCongeAction = () => {
         if (!modalConge.conge) return;
 
-        const id = modalConge.conge.id;
-        const options = {
-            onSuccess: () => {},
-            onError: () => {},
-            onFinish: () => {
-                closeCongeModal(); // Appelé dans tous les cas
-            }
-        };
+        const url = modalConge.action === 'cancel' 
+            ? route('conges.cancel', { id: modalConge.conge.id })
+            : route('conges.delete', { id: modalConge.conge.id });
 
-        if (modalConge.action === 'accept') {
-            router.post(route('conges.accept', { id }), {}, options);
-        } else if (modalConge.action === 'refuse') {
-            router.post(route('conges.refuse', { id }), {}, options);
-        } else if (modalConge.action === 'cancel') {
-            router.post(route('conges.cancel', { id }), {}, options);
-        } else if (modalConge.action === 'delete') {
-            router.delete(route('conges.delete', { id }), options);
-        }
+        router.post(url, {}, {
+            onSuccess: () => {
+                closeCongeModal();
+                toast.success(modalConge.action === 'cancel' 
+                    ? "Congé annulé avec succès" 
+                    : "Congé supprimé avec succès");
+            },
+            onError: () => {
+                toast.error("Une erreur est survenue");
+            }
+        });
     };
 
-
-    // Fonction pour filtrer les congés
+    // Filtrer les congés
     useEffect(() => {
-        if (!conges) return;
+        let filtered = [...myConges];
 
-        let filtered = conges.filter(conge =>
-            (!data.searchTerm || (conge.user?.name && conge.user.name.toLowerCase().includes(data.searchTerm.toLowerCase()))) &&
-            (!data.motif || (conge.motif && conge.motif.toLowerCase().includes(data.motif.toLowerCase()))) &&
-            (!data.status || conge.status === data.status) &&
-            (!data.user_id || Number(conge.user_id) === Number(data.user_id))
-        );
+        if (data.searchTerm) {
+            filtered = filtered.filter(conge => 
+                conge.user?.name.toLowerCase().includes(data.searchTerm.toLowerCase())
+            );
+        }
+
+        if (data.motif) {
+            filtered = filtered.filter(conge => 
+                conge.motif.toLowerCase().includes(data.motif.toLowerCase())
+            );
+        }
+
+        if (data.status) {
+            filtered = filtered.filter(conge => conge.status === data.status);
+        }
 
         if (data.start_date) {
             const startDate = new Date(data.start_date);
@@ -110,27 +125,22 @@ export default function IndexConges({ auth, conges, users, flash }) {
             filtered = filtered.filter(conge => new Date(conge.date_fin) <= endDate);
         }
 
-        if (selectedUsers.length > 0) {
-            filtered = filtered.filter(conge => selectedUsers.includes(conge.user_id));
-        }
-
         setFilteredConges(filtered);
         setCurrentPage(1);
-    }, [data.searchTerm, data.motif, data.status, data.start_date, selectedUsers, data.end_date, data.user_id, conges]);
+    }, [data.searchTerm,data.motif,data.status,data.start_date,data.end_date]);
+    //     }, [data, myConges]);
 
     const openEditConge = (conge) => {
         setCongeToEdit(conge);
         setShowEditForm(true);
     };
 
-    // Fonction pour obtenir les éléments de la page courante
     const getCurrentPageItems = () => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         return filteredConges.slice(startIndex, endIndex);
     };
 
-    // Fonction pour gérer le changement de page
     const handlePageChange = (pageNumber) => {
         if (pageNumber >= 1 && pageNumber <= Math.ceil(filteredConges.length / itemsPerPage)) {
             setCurrentPage(pageNumber);
@@ -140,28 +150,6 @@ export default function IndexConges({ auth, conges, users, flash }) {
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setData(name, value);
-    };
-
-    const handleAcceptConge = (conge) => {
-    post(route('conges.accept', conge.id), {}, {
-        onSuccess: () => {
-            toast.success("Congé accepté avec succès.");
-        },
-        onError: () => {
-            toast.error("Erreur lors de l'acceptation du congé.");
-        }
-    });
-    };
-
-    const handleRefuseConge = (conge) => {
-        post(route('conges.refuse', conge.id), {}, {
-            onSuccess: () => {
-                toast.success("Congé refusé avec succès.");
-            },
-            onError: () => {
-                toast.error("Erreur lors du refus du congé.");
-            }
-        });
     };
 
     const getStatusBadge = (status) => {
@@ -177,16 +165,12 @@ export default function IndexConges({ auth, conges, users, flash }) {
         }
     };
 
-    // Options pour le nombre d'éléments par page
-    const itemsPerPageOptions = [5, 10, 20, 25, 50, 100, 150, 200, 300, 400, 600, 1000];
+    const itemsPerPageOptions = [5, 10, 20, 25, 50, 100];
     const totalConges = filteredConges.length;
     const availableOptions = itemsPerPageOptions.filter(option => option <= totalConges || option === itemsPerPageOptions[0]);
 
-    // Initialiser filteredConges avec conges au chargement
     useEffect(() => {
-        if (conges) {
-            setFilteredConges(conges);
-        }
+        setFilteredConges(myConges);
     }, [conges]);
 
     useEffect(() => {
@@ -199,55 +183,25 @@ export default function IndexConges({ auth, conges, users, flash }) {
     }, [flash]);
 
     return (
-        <Authenticated user={auth.user} header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Gestion des Congés</h2>}>
-            <Head title="Gestion des Congés" />
+        <Authenticated user={auth.user} header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Mes Demandes de Congés</h2>}>
+            <Head title="Mes Demandes de Congés" />
             <div className="mx-auto sm:px-6 lg:px-8">
                 <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div className="p-6 bg-white border-b border-gray-200">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="mr-1 text-lg font-medium text-gray-900">Liste des demandes de congés</h3>
-                            {/* {width < 550 ?
-                                <div className="flex space-x-3">
-                                    <button
-                                        onClick={() => setShowAddForm(true)}
-                                        title="Ajouter une nouvelle demande de congé"
-                                        className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-                                    >
-                                        <BsPlusCircle />
-                                    </button>
-                                </div> :
-                                <div className="flex space-x-3">
-                                    <button
-                                        onClick={() => setShowAddForm(true)}
-                                        title="Ajouter une nouvelle demande de congé"
-                                        className="px-2 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-                                    >
-                                        <span className="flex justify-center items-center"><BsPlusCircle />&nbsp; Nouvelle Demande</span>
-                                    </button>
-                                </div>
-                            } */}
+                            <h3 className="mr-1 text-lg font-medium text-gray-900">Liste de mes demandes de congés</h3>
+                            <button
+                                onClick={() => setShowAddForm(true)}
+                                title="Demander un nouveau congé"
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center"
+                            >
+                                <BsPlusCircle className="mr-2" />
+                                <span>Nouvelle Demande</span>
+                            </button>
                         </div>
 
+                        {/* Filtres */}
                         <div className="flex flex-wrap items-end gap-3 mb-7 relative z-0">
-                            {/* Filtre par employé */}
-                            <div className="relative flex-1 min-w-[200px]">
-                                <label htmlFor="searchTerm" className="text-xs font-medium text-gray-700 mb-1 block">Recherche par employé:</label>
-                                <div className="relative">
-                                    <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                    <input
-                                        type="text"
-                                        id="searchTerm"
-                                        name="searchTerm"
-                                        value={data.searchTerm}
-                                        onChange={handleFilterChange}
-                                        className="block w-full pl-10 pr-3 py-1 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        placeholder="Nom de l'employé..."
-                                    />
-                                </div>
-                            </div>
-
                             {/* Filtre par motif */}
                             <div className="relative flex-1 min-w-[200px]">
                                 <label htmlFor="motif" className="text-xs font-medium text-gray-700 mb-1 block">Recherche par motif:</label>
@@ -283,18 +237,6 @@ export default function IndexConges({ auth, conges, users, flash }) {
                                     <option value="refuse">Refusé</option>
                                 </select>
                             </div>
-
-                            {/* Filtre par employé */}
-                            {users && (
-                                <div className="relative flex-1 min-w-[200px] z-20">
-                                    <MultiSelectDropdown
-                                        label="Employés :"
-                                        options={users}
-                                        selectedOptions={selectedUsers}
-                                        setSelectedOptions={setSelectedUsers}
-                                    />
-                                </div>
-                            )}
 
                             {/* Dates de congé */}
                             <div className="flex-1 min-w-[150px]">
@@ -351,13 +293,11 @@ export default function IndexConges({ auth, conges, users, flash }) {
                             </div>
                         </div>
 
+                        {/* Tableau des congés */}
                         <div className="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto">
                             <table className="border-collapse table-auto w-full whitespace-nowrap">
                                 <thead>
                                     <tr className="text-left bg-gray-50">
-                                        <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Employé
-                                        </th>
                                         <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Motif
                                         </th>
@@ -390,9 +330,6 @@ export default function IndexConges({ auth, conges, users, flash }) {
                                             
                                             return (
                                                 <tr key={conge.id} className="hover:bg-gray-50">
-                                                    <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
-                                                        {conge.user?.name || <span className="italic text-gray-400">Employé non trouvé</span>}
-                                                    </td>
                                                     <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
                                                         {conge.motif || <span className="italic text-gray-400">Aucun motif</span>}
                                                     </td>
@@ -415,30 +352,22 @@ export default function IndexConges({ auth, conges, users, flash }) {
                                                         <div className="flex space-x-2 justify-center">
                                                             {conge.status === 'en_attente' && (
                                                                 <>
-                                                                  <button
-                                                                      onClick={() => openCongeModal(conge, 'accept')}
-                                                                      title={`Accepter le congé de ${conge.user?.name || 'cet employé'}`}
-                                                                      className="text-green-600 hover:text-green-900 px-2 py-1 rounded bg-green-100"
-                                                                  >
-                                                                      <MdOutlineDone />
-                                                                  </button>
-
-                                                                  <button
-                                                                      onClick={() => openCongeModal(conge, 'refuse')}
-                                                                      title={`Refuser le congé de ${conge.user?.name || 'cet employé'}`}
-                                                                      className="text-red-600 hover:text-red-900 px-2 py-1 rounded bg-red-100"
-                                                                  >
-                                                                      <RxCross2 />
-                                                                  </button>
+                                                                    <button
+                                                                        onClick={() => openEditConge(conge)}
+                                                                        title="Modifier le congé"
+                                                                        className="text-yellow-600 hover:text-yellow-900 px-2 py-1 rounded bg-yellow-100"
+                                                                    >
+                                                                        <BiEdit />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => openDeleteConfirm(conge)}
+                                                                        title="Annuler le congé"
+                                                                        className="text-red-600 hover:text-red-900 px-2 py-1 rounded bg-red-100"
+                                                                    >
+                                                                        <MdOutlineCancel />
+                                                                    </button>
                                                                 </>
                                                             )}
-                                                            {/* <button
-                                                                onClick={() => openEditConge(conge)}
-                                                                title="Modifier le congé"
-                                                                className="text-yellow-600 hover:text-yellow-900 px-2 py-1 rounded bg-yellow-100"
-                                                            >
-                                                                <BiEdit />
-                                                            </button> */}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -492,34 +421,48 @@ export default function IndexConges({ auth, conges, users, flash }) {
                         )}
                     </div>
 
+                    {/* Modals */}
                     {showEditForm && congeToEdit && (
                         <ModalWrapper
-                            title={`Modifier la demande de congé de ${congeToEdit.user?.name}`}
+                            title={`Modifier ma demande de congé`}
                             onClose={() => setShowEditForm(false)}
                         >
                             <EditConges
                                 conge={congeToEdit}
                                 setShowEdit={setShowEditForm}
-                                users={users}
                             />
                         </ModalWrapper>
                     )}
 
                     {showAddForm && (
-                        <ModalWrapper title="Ajouter une nouvelle demande de congé" onClose={() => setShowAddForm(false)}>
-                            <AddConges setShowAddForm={setShowAddForm} users={users} />
+                        <ModalWrapper 
+                            title="Demander un nouveau congé" 
+                            onClose={() => setShowAddForm(false)}
+                        >
+                            <AddConges 
+                                setShowAddForm={setShowAddForm} 
+                                userId={auth.user.id}
+                            />
                         </ModalWrapper>
                     )}
 
-                    {modalConge.isOpen && modalConge.conge && (
-                        <ConfirmCongeAction
-                            conge={modalConge.conge}
-                            action={modalConge.action}
-                            onConfirm={confirmCongeAction}
-                            onCancel={closeCongeModal}
+                    {showConfirmDelete && congeToDelete && (
+                        <ConfirmCongeAnnuler
+                            conge={congeToDelete}
+                            onCancel={() => setShowConfirmDelete(false)}
+                            onConfirm={() => {
+                                router.delete(route('conges.delete', { id: congeToDelete.id }), {
+                                    onSuccess: () => {
+                                        setShowConfirmDelete(false);
+                                    },
+                                    onError: () => {
+                                        toast.error("Erreur lors de la suppression du congé");
+                                    }
+                                });
+                                setShowConfirmDelete(false);
+                            }}
                         />
                     )}
-
                 </div>
             </div>
         </Authenticated>

@@ -1,22 +1,14 @@
-import React from 'react';
-import { MdOutlineDone } from 'react-icons/md';
-import { RxCross2 } from 'react-icons/rx';
+import React from "react";
 
-export default function ConfirmCongeAction({ conge, action, onConfirm, onCancel }) {
-    const isAccept = action === 'accept';
-    const actionText = isAccept ? 'accepter' : 'refuser';
-    const buttonClass = isAccept 
-        ? 'bg-green-600 hover:bg-green-700' 
-        : 'bg-red-600 hover:bg-red-700';
-
+export default function ConfirmCongeAnnuler({ onCancel, onConfirm }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
                 <h2 className="text-lg font-semibold mb-4">
-                    Confirmer {actionText} le congé
+                    Confirmer l'annulation
                 </h2>
                 <p className="mb-6">
-                    Voulez-vous vraiment {actionText} ce congé de {conge.user?.name || 'Inconnu'} ?
+                    Êtes-vous sûr de vouloir annuler cette demande de congé ?
                 </p>
                 <div className="flex justify-end space-x-3">
                     <button
@@ -27,9 +19,9 @@ export default function ConfirmCongeAction({ conge, action, onConfirm, onCancel 
                     </button>
                     <button
                         onClick={onConfirm}
-                        className={`px-4 py-2 rounded text-white flex items-center gap-2 ${buttonClass}`}
+                        className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 flex items-center"
                     >
-                        {actionText.charAt(0).toUpperCase() + actionText.slice(1)}
+                        Confirmer
                     </button>
                 </div>
             </div>
