@@ -39,4 +39,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'updated_at' => 'datetime',
     ];
 
+    public function employe()
+    {
+        return $this->hasOne(Employe::class);
+    }
 }

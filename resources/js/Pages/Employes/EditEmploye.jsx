@@ -1,9 +1,291 @@
-import React from 'react'
+import React from 'react';
+import { useForm } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 
-function EditEmploye() {
-  return (
-    <div>EditEmploye</div>
-  )
+function EditEmploye({ employe, setShowEditForm }) {
+    const { auth, departements } = usePage().props;
+    const { data, setData, post, processing, errors } = useForm({
+        id:employe.user.id,
+        name: employe.user.name,
+        email: employe.user.email,
+        role: employe.user.role,
+        departement_id: employe.departement_id,
+        matricule: employe.matricule,
+        poste: employe.poste,
+        date_embauche: employe.date_embauche,
+        telephone: employe.telephone,
+        adresse: employe.adresse,
+        date_naissance: employe.date_naissance,
+        ville: employe.ville,
+        etat_civil: employe.etat_civil,
+        genre: employe.genre,
+        cnss: employe.cnss,
+        cin: employe.cin,
+        photo: null,
+    });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        post(route('employes.update', employe.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowEditForm(false);
+            },
+        });
+    };
+
+    const handleFileChange = (e) => {
+        setData('photo', e.target.files[0]);
+    };
+
+    return (
+        <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div className="p-6 bg-white border-b border-gray-200">
+                    <h3 className="text-lg font-medium mb-4">Modifier l'employé</h3>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Nom complet
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                />
+                                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                />
+                                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Matricule
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.matricule}
+                                    onChange={(e) => setData('matricule', e.target.value)}
+                                />
+                                {errors.matricule && <p className="text-red-500 text-xs mt-1">{errors.matricule}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Département
+                                </label>
+                                <select
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.departement_id}
+                                    onChange={(e) => setData('departement_id', e.target.value)}
+                                >
+                                    <option value="">Sélectionner un département</option>
+                                    {departements.map((departement) => (
+                                        <option key={departement.id} value={departement.id}>
+                                            {departement.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.departement_id && <p className="text-red-500 text-xs mt-1">{errors.departement_id}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Poste
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.poste}
+                                    onChange={(e) => setData('poste', e.target.value)}
+                                />
+                                {errors.poste && <p className="text-red-500 text-xs mt-1">{errors.poste}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Date d'embauche
+                                </label>
+                                <input
+                                    type="date"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.date_embauche}
+                                    onChange={(e) => setData('date_embauche', e.target.value)}
+                                />
+                                {errors.date_embauche && <p className="text-red-500 text-xs mt-1">{errors.date_embauche}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Téléphone
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.telephone}
+                                    onChange={(e) => setData('telephone', e.target.value)}
+                                />
+                                {errors.telephone && <p className="text-red-500 text-xs mt-1">{errors.telephone}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Photo
+                                </label>
+                                <input
+                                    type="file"
+                                    className="w-full border rounded px-3 py-1"
+                                    onChange={handleFileChange}
+                                    accept="image/*"
+                                />
+                                {errors.photo && <p className="text-red-500 text-xs mt-1">{errors.photo}</p>}
+                            </div>
+
+                            <div className="col-span-2 mt-4">
+                                <h4 className="font-semibold text-gray-800 mb-3">Informations personnelles</h4>
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Adresse
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.adresse}
+                                    onChange={(e) => setData('adresse', e.target.value)}
+                                />
+                                {errors.adresse && <p className="text-red-500 text-xs mt-1">{errors.adresse}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Date de naissance
+                                </label>
+                                <input
+                                    type="date"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.date_naissance}
+                                    onChange={(e) => setData('date_naissance', e.target.value)}
+                                />
+                                {errors.date_naissance && <p className="text-red-500 text-xs mt-1">{errors.date_naissance}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Ville
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.ville}
+                                    onChange={(e) => setData('ville', e.target.value)}
+                                />
+                                {errors.ville && <p className="text-red-500 text-xs mt-1">{errors.ville}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    État civil
+                                </label>
+                                <select
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.etat_civil}
+                                    onChange={(e) => setData('etat_civil', e.target.value)}
+                                >
+                                    <option value="">Sélectionner</option>
+                                    <option value="celibataire">Célibataire</option>
+                                    <option value="marie">Marié{data.genre === "F" ? "e" : null}</option>
+                                    <option value="divorce">Divorcé{data.genre === "F" ? "e" : null}</option>
+                                    <option value="veuf">Veu{data.genre === "F" ? "ve" : "f"}</option>
+                                </select>
+                                {errors.etat_civil && <p className="text-red-500 text-xs mt-1">{errors.etat_civil}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Genre
+                                </label>
+                                <select
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.genre}
+                                    onChange={(e) => setData('genre', e.target.value)}
+                                >
+                                    <option value="">Sélectionner</option>
+                                    <option value="H">Homme</option>
+                                    <option value="F">Femme</option>
+                                </select>
+                                {errors.genre && <p className="text-red-500 text-xs mt-1">{errors.genre}</p>}
+                            </div>
+
+                            <div className="col-span-2 mt-4">
+                                <h4 className="font-semibold text-gray-800 mb-3">Informations administratives</h4>
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    Numéro CNSS
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.cnss}
+                                    onChange={(e) => setData('cnss', e.target.value)}
+                                />
+                                {errors.cnss && <p className="text-red-500 text-xs mt-1">{errors.cnss}</p>}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    CIN
+                                </label>
+                                <input
+                                    type="text"
+                                    className="w-full border rounded px-3 py-1"
+                                    value={data.cin}
+                                    onChange={(e) => setData('cin', e.target.value)}
+                                />
+                                {errors.cin && <p className="text-red-500 text-xs mt-1">{errors.cin}</p>}
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end space-x-4 mt-6">
+                            <button
+                                type="button"
+                                onClick={() => setShowEditForm(false)}
+                                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className={`px-6 py-2 bg-yellow-100 text-yellow-600 rounded-md hover:text-yellow-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
+                                    processing ? "opacity-75 cursor-not-allowed" : ""
+                                }`}
+                            >
+                                {processing ? "Enregistrement..." : "Modifier l'employé"}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
 }
 
-export default EditEmploye
+export default EditEmploye;

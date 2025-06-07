@@ -148,6 +148,12 @@ export default function Authenticated({ user, header, children }) {
                     <NavLink href={route("conges.public")} active={route().current("conges.public")} >
                             <div className="flex text-blue-600 items-center gap-2">
                                 <FaRegCalendarAlt style={{ color: colors.primary }} />
+                                <span>Espace Personnel</span>
+                            </div>
+                    </NavLink>
+                    <NavLink href={route("conges.public")} active={route().current("conges.public")} >
+                            <div className="flex text-blue-600 items-center gap-2">
+                                <FaRegCalendarAlt style={{ color: colors.primary }} />
                                 <span>Mes congés</span>
                             </div>
                     </NavLink>

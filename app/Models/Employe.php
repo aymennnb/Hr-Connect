@@ -16,6 +16,7 @@ class Employe extends Model
         'poste',
         'date_embauche',
         'telephone',
+        'email',
         'adresse',
         'date_naissance',
         'ville',

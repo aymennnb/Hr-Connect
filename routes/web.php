@@ -105,6 +105,16 @@ Route::middleware(['auth','verified'])->group(function () {
                 Route::post('employes-delete', 'bulkDelete')->name('employes.bulkDelete');
             });
 
+            Route::prefix('employes')->controller(EmployesController::class)->group(function () {
+                Route::get('/', 'index')->name('employes');
+                Route::inertia('add', 'Employes/AddEmploye')->name('employes.add');
+                Route::post('create', 'create')->name('employes.create');
+                Route::get('edit/{id}', 'edit')->name('employes.edit');
+                Route::post('update', 'update')->name('employes.update');
+                Route::delete('delete/{id}', 'delete')->name('employes.delete');
+                Route::post('employes-delete', 'bulkDelete')->name('employes.bulkDelete');
+            });
+
             Route::prefix('salaires')->controller(SalaireController::class)->group(function () {
                 Route::get('/', 'index')->name('salaires');
             });

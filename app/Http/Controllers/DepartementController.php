@@ -38,7 +38,7 @@ class DepartementController extends Controller
             'user_id' => Auth::id(),
             'role' => Auth::user()->role,
             'action' => 'add',
-            'type' => 'departement',
+            'type' => 'departements',
             'message' => "a ajouté un nouveau département {$departement->name} ."
         ]);
 
@@ -69,7 +69,7 @@ class DepartementController extends Controller
             'user_id' => Auth::id(),
             'role' => Auth::user()->role,
             'action' => 'update',
-            'type' => 'departement',
+            'type' => 'departements',
             'message' => "a mis à jour le département {$departement->name} avec l'ID {$departement->id}"
         ]);
 
@@ -88,7 +88,7 @@ class DepartementController extends Controller
             'user_id' => Auth::id(),
             'role' => Auth::user()->role,
             'action' => 'delete',
-            'type' => 'departement',
+            'type' => 'departements',
             'message' => "a supprimé le département {$name} avec l'ID {$departement->id}"
         ]);
 
@@ -113,7 +113,7 @@ class DepartementController extends Controller
                     'user_id' => Auth::id(),
                     'role' => Auth::user()->role,
                     'action' => 'delete',
-                    'type' => 'departement',
+                    'type' => 'departements',
                     'message' => "a supprimé le département {$name} avec l'ID {$id}"
                 ]);
             }

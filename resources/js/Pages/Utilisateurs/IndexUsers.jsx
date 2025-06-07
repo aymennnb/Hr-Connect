@@ -739,8 +739,20 @@ export default function IndexUsers({ auth,AccessTable, documents,users, flash })
                 </div>
             </div>
             {showEditForm && userToEdit && (
-                <ModalWrapper title={`Modifier les information de l'utilisateur ${userToEdit.name}`} onClose={() => setShowEditForm(false)}>
-                    <EditUser auth={auth} user={userToEdit} setShowEditForm={setShowEditForm} showEditForm={showEditForm}/>
+                <ModalWrapper 
+                    title={`Modifier les informations ${
+                        userToEdit.role === 'manager' ? 'du responsable RH' :
+                        userToEdit.role === 'admin' ? 'de l\'administrateur' :
+                        'de l\'employé'
+                    } ${userToEdit.name}`} 
+                    onClose={() => setShowEditForm(false)}
+                >
+                    <EditUser 
+                        auth={auth} 
+                        user={userToEdit} 
+                        setShowEditForm={setShowEditForm} 
+                        showEditForm={showEditForm}
+                    />
                 </ModalWrapper>
             )}
             {showAddForm && (

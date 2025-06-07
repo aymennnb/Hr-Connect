@@ -213,18 +213,11 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
             return;
         }
 
-        post(route("employes.EmployesDelete"), {
+        post(route("employes.bulkDelete"), {
             onSuccess: () => {
                 setData("employes_ids", []);
-                toast.success(
-                    `${data.employes_ids.length} employé(s) supprimé(s) avec succès.`
-                );
-            },
-            onError: () => {
-                toast.error("Erreur lors de la suppression des employés.");
-            },
+            }
         });
-
         setShowEmployesDelete(false);
     };
 
@@ -235,16 +228,7 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
 
     const confirmDelete = () => {
         if (!employeToDelete) return;
-
-        destroy(`/employes/delete/${employeToDelete.id}`, {
-            onSuccess: () => {
-                toast.success("Employé supprimé avec succès.");
-            },
-            onError: () => {
-                toast.error("Erreur lors de la suppression.");
-            },
-        });
-
+        destroy(`/employes/delete/${employeToDelete.id}`);
         setIsModalOpen(false);
         setEmployeToDelete(null);
     };
@@ -298,16 +282,22 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
 
     const calculateAge = (birthDate) => {
         if (!birthDate) return null;
-        const today = new Date();
+        
         const birth = new Date(birthDate);
+        
+        if (isNaN(birth.getTime())) {
+            console.error('Date de naissance invalide:', birthDate);
+            return null;
+        }
+
+        const today = new Date();
         let age = today.getFullYear() - birth.getFullYear();
         const monthDiff = today.getMonth() - birth.getMonth();
-        if (
-            monthDiff < 0 ||
-            (monthDiff === 0 && today.getDate() < birth.getDate())
-        ) {
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
             age--;
         }
+        
         return age;
     };
 
@@ -579,6 +569,9 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
                                             Téléphone
                                         </th>
                                         <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Email
+                                        </th>
+                                        <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Ville
                                         </th>
                                         <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -640,7 +633,10 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
                                                         Genre: {employe.genre === "M" ? "Homme" : "Femme"}
                                                     </div>
                                                     <div className="text-xs text-gray-500">
-                                                        Âge: {employe.date_naissance ? calculateAge(employe.date_naissance) + " ans" : "N/A"}
+                                                        Âge: {(() => {
+                                                            const age = calculateAge(employe.date_naissance);
+                                                            return age !== null ? `${age} ans` : "N/A";
+                                                        })()}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
@@ -651,6 +647,9 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
                                                 </td>
                                                 <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
                                                     {employe.telephone || <span className="italic text-gray-400">N/A</span>}
+                                                </td>
+                                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
+                                                    {employe.email || <span className="italic text-gray-400">Non défini</span>}
                                                 </td>
                                                 <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
                                                     {employe.ville || <span className="italic text-gray-400">Non défini</span>}
@@ -741,12 +740,20 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
                                 onClose={() => setShowAddForm(false)}
                                 departements={departements}
                                 users={users}
+                                setShowAddForm={setShowAddForm}
                             />
                         </ModalWrapper>
                     )}
 
                     {showEditModal && (
-                        <ModalWrapper title={`Modifier les informations de ${employeToEdit?.user?.name}`} onClose={() => setShowEditModal(false)}>
+                        <ModalWrapper 
+                            title={`Modifier les informations ${
+                                employeToEdit?.user?.role === 'manager' ? 'du responsable RH' : 
+                                employeToEdit?.user?.role === 'admin' ? 'de l\'administrateur' :
+                                'de l\'employé'
+                            } ${employeToEdit?.user?.name}`} 
+                            onClose={() => setShowEditModal(false)}
+                        >
                             {employeToEdit && (
                                 <EditEmploye
                                     employe={employeToEdit}
@@ -754,6 +761,7 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
                                         setShowEditModal(false);
                                         setEmployeToEdit(null);
                                     }}
+                                    setShowEditForm={setShowEditModal}
                                     departements={departements}
                                     users={users}
                                 />

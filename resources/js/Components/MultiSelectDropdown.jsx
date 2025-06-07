@@ -93,7 +93,7 @@ export default function MultiSelectDropdown({ options, selectedOptions, setSelec
                         {/* Message quand aucun résultat ne correspond */}
                         {filteredOptions.length === 0 && (
                             <div className="px-2 py-2 text-sm text-gray-500">
-                                <span className="italic text-gray-400">Aucun site trouvé</span>
+                                <span className="italic text-gray-400">Aucun résultat trouvé</span>
                             </div>
                         )}
                     </div>
