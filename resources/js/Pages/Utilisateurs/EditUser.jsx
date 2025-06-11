@@ -80,7 +80,6 @@ export default function EditUser({ auth, user, setShowEditForm }) {
                                             onClick={() => setShowPassword(!showPassword)}
                                             className="absolute right-2 top-1.5 text-gray-600"
                                         >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                         </button>
                                     </div>
                                     {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password}</p>}

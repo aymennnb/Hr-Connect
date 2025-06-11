@@ -50,10 +50,10 @@ class UserController extends Controller
             'role' => auth()->user()->role,
             'action' => 'add',
             'type' => 'user',
-            'message' => "a ajouté un nouvel " . $this->translateRole($user->role) . " avec le nom {$user->name} et l'ID {$user->id}.",
+            'message' => "a ajouté un nouvel " . $this->translateRole($user->role) . " avec le nom {$user->name} et l'ID {$user->id}",
         ]);
 
-        return redirect()->route('utilisateurs')->with(['success' => "L'utilisateur {$user->name} a été ajouté avec succès."]);
+        return redirect()->route('utilisateurs')->with(['success' => "L'utilisateur {$user->name} a été ajouté avec succès"]);
     }
 
     public function updateRole(Request $request)
@@ -73,10 +73,10 @@ class UserController extends Controller
             'role' => auth()->user()->role,
             'action' => 'updaterole',
             'type' => 'user',
-            'message' => "a changé le rôle d'un utilisateur avec le nom {$user->name} et l'ID {$user->id} de " . $this->translateRole($ancien_role) . " à " . $this->translateRole($request->role) . ".",
+            'message' => "a changé le rôle d'un utilisateur avec le nom {$user->name} et l'ID {$user->id} de " . $this->translateRole($ancien_role) . " à " . $this->translateRole($request->role) . "",
         ]);
 
-        return redirect('utilisateurs')->with(['success'=> "Le rôle de l'utilisateur {$user->name} a été mis à jour de " . $this->translateRole($ancien_role) . " à " . $this->translateRole($user->role) . "."]);  
+        return redirect('utilisateurs')->with(['success'=> "Le rôle de l'utilisateur {$user->name} a été mis à jour de " . $this->translateRole($ancien_role) . " à " . $this->translateRole($user->role) . ""]);  
     }
 
     public function resetPassword($id)
@@ -92,10 +92,10 @@ class UserController extends Controller
             'role' => auth()->user()->role,
             'action' => 'reset',
             'type' => 'user',
-            'message' => "a réinitialisé le mot de passe d'un " . $this->translateRole($user->role) . " avec le nom {$user->name} et l'ID {$user->id}.",
+            'message' => "a réinitialisé le mot de passe d'un " . $this->translateRole($user->role) . " avec le nom {$user->name} et l'ID {$user->id}",
         ]);
 
-        return redirect('utilisateurs')->with(['success' => "Le mot de passe de {$user->name} (" . $this->translateRole($user->role) . ") a été réinitialisé à la valeur par défaut."]);
+        return redirect('utilisateurs')->with(['success' => "Le mot de passe de {$user->name} (" . $this->translateRole($user->role) . ") a été réinitialisé à la valeur par défaut"]);
     }
 
     public function edit($id)
@@ -111,7 +111,7 @@ class UserController extends Controller
         $item = User::find($request->id);
 
         if (!$item) {
-            return redirect('utilisateurs')->with(['error' => 'Utilisateur non trouvé.']);
+            return redirect('utilisateurs')->with(['error' => 'Utilisateur non trouvé']);
         }
 
         $item->name = $request->name;
@@ -127,10 +127,10 @@ class UserController extends Controller
             'role' => auth()->user()->role,
             'action' => 'update',
             'type' => 'user',
-            'message' => "a modifié les informations d'un " . $this->translateRole($item->role) . " avec le nom {$item->name} et l'ID {$item->id}.",
+            'message' => "a modifié les informations d'un " . $this->translateRole($item->role) . " avec le nom {$item->name} et l'ID {$item->id}",
         ]);
 
-        return redirect('utilisateurs')->with(['success' => "L'utilisateur {$item->name} (" . $this->translateRole($item->role) . ") a été mis à jour."]);
+        return redirect('utilisateurs')->with(['success' => "L'utilisateur {$item->name} (" . $this->translateRole($item->role) . ") a été mis à jour"]);
     }
 
     public function delete($id)
@@ -146,13 +146,13 @@ class UserController extends Controller
             'role' => auth()->user()->role,
             'action' => 'delete',
             'type' => 'user',
-            'message' => "a supprimé un " . $this->translateRole($item->role) . " avec le nom {$item->name} et l'ID {$item->id}.",
+            'message' => "a supprimé un " . $this->translateRole($item->role) . " avec le nom {$item->name} et l'ID {$item->id}",
         ]);
 
         // Supprimer l'utilisateur
         $item->delete();
 
-        return redirect('utilisateurs')->with(['success' => "L'utilisateur {$item->name} (" . $this->translateRole($item->role) . ") a été supprimé avec succès."]);
+        return redirect('utilisateurs')->with(['success' => "L'utilisateur {$item->name} (" . $this->translateRole($item->role) . ") a été supprimé avec succès"]);
     }
 
     public function UsersDelete(Request $request)
@@ -168,16 +168,16 @@ class UserController extends Controller
                     'role' => auth()->user()->role,
                     'action' => 'delete',
                     'type' => 'user',
-                    'message' => "a supprimé un " . $this->translateRole($user->role) . " avec le nom {$user->name} et l'ID {$user->id}.",
+                    'message' => "a supprimé un " . $this->translateRole($user->role) . " avec le nom {$user->name} et l'ID {$user->id}",
                 ]);
 
                 $user->delete();
             }
 
-            return redirect()->route('utilisateurs')->with(['success' => 'Les utilisateurs sélectionnés ont été supprimés.']);
+            return redirect()->route('utilisateurs')->with(['success' => 'Les utilisateurs sélectionnés ont été supprimés']);
         }
 
-        return redirect()->route('utilisateurs')->with(['error' => 'Aucun utilisateur sélectionné pour la suppression.']);
+        return redirect()->route('utilisateurs')->with(['error' => 'Aucun utilisateur sélectionné pour la suppression']);
     }
 
     public function changeGroupRole(Request $request)
@@ -197,11 +197,11 @@ class UserController extends Controller
                 'role' => auth()->user()->role,
                 'action' => 'update',
                 'type' => 'user',
-                'message' => "a changé le rôle d'un acteur avec le nom {$user->name} et l'ID {$user->id} de " . $this->translateRole($ancien_role) . " à " . $this->translateRole($request->role_group) . ".",
+                'message' => "a changé le rôle d'un acteur avec le nom {$user->name} et l'ID {$user->id} de " . $this->translateRole($ancien_role) . " à " . $this->translateRole($request->role_group) . "",
             ]);
         }
 
-        return redirect()->route('utilisateurs')->with(['success' => 'Les rôles des utilisateurs sélectionnés ont été mis à jour de ' . $this->translateRole($ancien_role) . ' à ' . $this->translateRole($request->role_group) . '.']);
+        return redirect()->route('utilisateurs')->with(['success' => 'Les rôles des utilisateurs sélectionnés ont été mis à jour de ' . $this->translateRole($ancien_role) . ' à ' . $this->translateRole($request->role_group) . '']);
     }
 
     public function updateAccessDocs(Request $request)
@@ -237,7 +237,7 @@ class UserController extends Controller
                 'role' => auth()->user()->role,
                 'action' => 'updateAccessLimit',
                 'type' => 'document',
-                'message' => "a limité l'accès au document {$doc->title} (id: {$documentId}) à l'utilisateur {$user->name} (id: {$userId})."
+                'message' => "a limité l'accès au document {$doc->title} (id: {$documentId}) à l'utilisateur {$user->name} (id: {$userId})"
             ]);
         }
 

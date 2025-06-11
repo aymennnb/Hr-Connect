@@ -13,7 +13,6 @@ return new class extends Migration {
             $table->string('titre');
             $table->date('date_debut');
             $table->date('date_fin')->nullable();
-            $table->enum('statut', ['actif', 'expire', 'resilie', 'en_attente'])->default('en_attente');
             
             $table->decimal('salaire_mensuel', 10, 2);
             $table->decimal('taux_horaire', 8, 2);
@@ -25,7 +24,7 @@ return new class extends Migration {
             $table->string('document_path')->nullable();
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
-            $table->index(['employe_id', 'statut']);
+            $table->index('employe_id');
         });
     }
 

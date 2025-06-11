@@ -53,6 +53,7 @@ export default function AddDepartement({ setShowAddForm }) {
                                         onChange={(e) => setData("description", e.target.value)}
                                         placeholder="Entrez une description du département"
                                         rows={3}
+                                        style={{height:'180px'}}
                                     />
                                     {errors.description && <p className="mt-2 text-sm text-red-600">{errors.description}</p>}
                                 </div>

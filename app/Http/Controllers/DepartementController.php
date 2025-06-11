@@ -39,10 +39,10 @@ class DepartementController extends Controller
             'role' => Auth::user()->role,
             'action' => 'add',
             'type' => 'departements',
-            'message' => "a ajouté un nouveau département {$departement->name} ."
+            'message' => "a ajouté un nouveau département {$departement->name}"
         ]);
 
-        return redirect()->route('departements')->with(['success' => "Le département {$departement->name} a été créé avec succès."]);
+        return redirect()->route('departements')->with(['success' => "Le département {$departement->name} a été créé avec succès"]);
     }
 
     public function edit($id)
@@ -73,14 +73,28 @@ class DepartementController extends Controller
             'message' => "a mis à jour le département {$departement->name} avec l'ID {$departement->id}"
         ]);
 
-        return redirect()->route('departements')->with(['success' => "Le département {$departement->name} a été mis à jour avec succès."]);
+        return redirect()->route('departements')->with(['success' => "Le département {$departement->name} a été mis à jour avec succès"]);
     }
 
 
     public function delete($id)
     {
-        $departement = Departement::findOrFail($id);
+        $departement = Departement::withCount('employes')->findOrFail($id);
         $name = $departement->name;
+
+        if ($departement->employes_count > 0) {
+            Alerts::create([
+                'user_id' => Auth::id(),
+                'role' => Auth::user()->role,
+                'action' => 'try-delete',
+                'type' => 'departements',
+                'message' => "a tenté de supprimer le département {$name} avec l'ID {$departement->id} qui contient encore des employés"
+            ]);
+
+            return redirect()->route('departements')->with([
+                'error' => "Impossible de supprimer le département {$name} car il contient encore des employés"
+            ]);
+        }
 
         $departement->delete();
 
@@ -92,7 +106,9 @@ class DepartementController extends Controller
             'message' => "a supprimé le département {$name} avec l'ID {$departement->id}"
         ]);
 
-        return redirect()->route('departements')->with(['success' => "Le département {$name} a été supprimé avec succès"]);
+        return redirect()->route('departements')->with([
+            'success' => "Le département {$name} a été supprimé avec succès"
+        ]);
     }
 
     public function bulkDelete(Request $request)
@@ -103,20 +119,52 @@ class DepartementController extends Controller
             return back()->with(['error' => 'Aucun département sélectionné']);
         }
 
-        foreach ($ids as $id) {
-            $departement = Departement::find($id);
-            if ($departement) {
-                $name = $departement->name;
-                $departement->delete();
+        $departementsWithEmployees = [];
+        $deletedCount = 0;
 
+        foreach ($ids as $id) {
+            $departement = Departement::withCount('employes')->find($id);
+            
+            if (!$departement) {
+                continue;
+            }
+
+            if ($departement->employes_count > 0) {
+                $departementsWithEmployees[] = $departement->name;
+                
                 Alerts::create([
                     'user_id' => Auth::id(),
                     'role' => Auth::user()->role,
-                    'action' => 'delete',
+                    'action' => 'try-delete',
                     'type' => 'departements',
-                    'message' => "a supprimé le département {$name} avec l'ID {$id}"
+                    'message' => "a tenté de supprimer le département {$departement->name} avec l'ID {$id} qui contient encore des employés"
                 ]);
+                
+                continue;
             }
+
+            $name = $departement->name;
+            $departement->delete();
+
+            Alerts::create([
+                'user_id' => Auth::id(),
+                'role' => Auth::user()->role,
+                'action' => 'delete',
+                'type' => 'departements',
+                'message' => "a supprimé le département {$name} avec l'ID {$id}"
+            ]);
+
+            $deletedCount++;
+        }
+
+        if (!empty($departementsWithEmployees)) {
+            $message = $deletedCount > 0 
+                ? "{$deletedCount} département(s) supprimé(s), mais certains n'ont pas pu être supprimés car ils contiennent des employés"
+                : "Aucun département n'a pu être supprimé car ils contiennent tous des employés";
+
+            return back()
+                ->with($deletedCount > 0 ? 'success' : 'error', $message)
+                ->with('departements_with_employees', $departementsWithEmployees);
         }
 
         return back()->with(['success' => 'Les départements sélectionnés ont été supprimés avec succès']);

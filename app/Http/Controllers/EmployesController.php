@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EmployeInsertRequest;
 use App\Http\Requests\EmployeUpdateRequest;
+use App\Models\Contract;
 use App\Models\Employe;
 use App\Models\User;
 use App\Models\Departement;
 use App\Models\Alerts;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -30,8 +32,10 @@ class EmployesController extends Controller
 
     public function create(EmployeInsertRequest $request)
     {
+        // dd($request->all());
         $validated = $request->validated();
         
+        // Création de l'utilisateur
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -39,10 +43,13 @@ class EmployesController extends Controller
             'role' => $validated['role'],
         ]);
 
+        // Gestion de la photo
+        $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('employesPhotos', 'public');
         }
 
+        // Création de l'employé
         $employe = Employe::create([
             'user_id' => $user->id,
             'departement_id' => $validated['departement_id'],
@@ -61,7 +68,31 @@ class EmployesController extends Controller
             'email' => $validated['email'],
         ]);
 
-        
+        // Gestion du document du contrat
+        $documentPath = null;
+        if ($request->hasFile('contract_document_path')) {
+            $documentPath = $request->file('contract_document_path')->store('contracts', 'public');
+        }
+
+        // Création du contrat
+        $contract = Contract::create([
+            'reference' => $validated['contract_reference'],
+            'type_contrat' => $validated['contract_type'],
+            'titre' => $validated['contract_titre'],
+            'poste' => $validated['poste'],
+            'date_debut' => $validated['contract_date_debut'],
+            'date_fin' => $validated['contract_date_fin'] ?? null,
+            'salaire_mensuel' => $validated['contract_salaire_mensuel'] ?? 0,
+            'taux_horaire' => $validated['contract_taux_horaire'] ?? 0,
+            'taux_heures_supp' => $validated['contract_taux_heures_supp'] ?? 0,
+            'montant_fixe' => $validated['contract_montant_fixe'] ?? 0,
+            'mode_paiement' => $validated['contract_mode_paiement'],
+            'employe_id' => $employe->id,
+            'document_path' => $documentPath,
+            'created_by' => auth()->id(),
+        ]);
+
+        // Création des alertes
         Alerts::create([
             'user_id' => auth()->id(),
             'role' => auth()->user()->role,
@@ -70,7 +101,15 @@ class EmployesController extends Controller
             'message' => "a ajouté un employé avec le matricule {$employe->matricule}",
         ]);
 
-        return redirect()->route('employes')->with(['success'=> 'Employé ajouté avec succès.']);
+        Alerts::create([
+            'user_id' => auth()->id(),
+            'role' => auth()->user()->role,
+            'action' => 'add',
+            'type' => 'contrat',
+            'message' => "a créé un contrat {$contract->type_contrat} pour l'employé {$employe->matricule}",
+        ]);
+
+        return redirect()->route('employes')->with(['success' => 'Employé et contrat ajoutés avec succès']);
     }
 
     public function edit($id)
@@ -79,7 +118,7 @@ class EmployesController extends Controller
         return Inertia::render('Employes/EditEmploye', compact('employe'));
     }
 
-    public function update(EmployeUpdateRequest $request)
+    public function update(EmployeInsertRequest $request)
     {
         dd($request->all());
         // $employe = Employe::findOrFail($id);
@@ -125,6 +164,29 @@ class EmployesController extends Controller
         $employe = Employe::findOrFail($id);
         $user = $employe->user;
 
+        $today = Carbon::today();
+
+        $hasContract = Contract::where('employe_id', $employe->id)
+        ->where('date_debut', '<=', $today)
+        ->where(function($query) use ($today) {
+            $query->whereNull('date_fin')       
+                ->orWhere('date_fin', '>=', $today); 
+        })
+        ->exists();
+
+        if ($hasContract) {
+            Alerts::create([
+                'user_id' => auth()->id(),
+                'role' => auth()->user()->role,
+                'action' => 'try-delete',
+                'type' => 'employe',
+                'message' => "a tenté de supprimer l'employé avec le matricule {$employe->matricule} malgré qu'un contrat actif lui associé",
+            ]);
+            return redirect()->route('employes')->with([
+                'error' => "Impossible de supprimer l'employé avec le matricule {$employe->matricule} car il est actuellement associé à un contrat"
+            ]);
+        }
+
         if ($employe->photo && Storage::disk('public')->exists($employe->photo)) {
             Storage::disk('public')->delete($employe->photo);
         }
@@ -145,7 +207,7 @@ class EmployesController extends Controller
             'message' => "a supprimé l'employé avec le matricule {$matricule}",
         ]);
 
-        return redirect()->route('employes')->with(['success'=> 'Employé supprimé avec succès.']);
+        return redirect()->route('employes')->with(['success'=> 'Employé supprimé avec succès']);
     }
     
     public function bulkDelete(Request $request)
@@ -153,37 +215,84 @@ class EmployesController extends Controller
         $ids = $request->employes_ids;
 
         if (empty($ids)) {
-            return redirect()->route('employes')->with(['error' => 'Aucun employé sélectionné.']);
+            return redirect()->route('employes')->with(['error' => 'Aucun employé sélectionné']);
         }
+
+        $today = Carbon::today();
+        $employeesWithContracts = [];
+        $deletedCount = 0;
 
         foreach ($ids as $id) {
             $employe = Employe::find($id);
 
-            if ($employe) {
-                $user = $employe->user;
+            if (!$employe) {
+                continue;
+            }
 
-                if ($employe->photo && Storage::disk('public')->exists($employe->photo)) {
-                    Storage::disk('public')->delete($employe->photo);
-                }
+            $hasContract = Contract::where('employe_id', $employe->id)
+                ->where('date_debut', '<=', $today)
+                ->where(function($query) use ($today) {
+                    $query->whereNull('date_fin')       
+                        ->orWhere('date_fin', '>=', $today); 
+                })
+                ->exists();
 
-                $matricule = $employe->matricule;
-
-                $employe->delete();
-
-                if ($user) {
-                    $user->delete();
-                }
-
+            if ($hasContract) {
+                $employeesWithContracts[] = $employe->matricule;
                 Alerts::create([
                     'user_id' => auth()->id(),
                     'role' => auth()->user()->role,
-                    'action' => 'delete',
+                    'action' => 'try-delete',
                     'type' => 'employe',
-                    'message' => "a supprimé l'employé avec le matricule {$matricule}.",
+                    'message' => "a tenté de supprimer l'employé avec le matricule {$employe->matricule} malgré qu'un contrat actif lui associé",
                 ]);
+                continue;
             }
+
+            $user = $employe->user;
+
+            if ($employe->photo && Storage::disk('public')->exists($employe->photo)) {
+                Storage::disk('public')->delete($employe->photo);
+            }
+
+            $matricule = $employe->matricule;
+            $employe->delete();
+
+            if ($user) {
+                $user->delete();
+            }
+
+            Alerts::create([
+                'user_id' => auth()->id(),
+                'role' => auth()->user()->role,
+                'action' => 'delete',
+                'type' => 'employe',
+                'message' => "a supprimé l'employé avec le matricule {$matricule}",
+            ]);
+
+            $deletedCount++;
         }
 
-        return redirect()->route('employes')->with(['success' => 'Les employés sélectionnés ont été supprimés avec succès.']);
+        if (!empty($employeesWithContracts)) {
+            $errorMessage = $deletedCount > 0 
+                ? 'Certains employés ont été supprimés, mais les employés avec les matricules suivants n\'ont pas pu être supprimés car ils ont des contrats actifs : ' . implode(', ', $employeesWithContracts)
+                : 'Impossible de supprimer les employés avec les matricules suivants car ils ont des contrats actifs : ' . implode(', ', $employeesWithContracts);
+
+            Alerts::create([
+                'user_id' => auth()->id(),
+                'role' => auth()->user()->role,
+                'action' => 'try-delete',
+                'type' => 'employe',
+                'message' => "a tenté de supprimer des employés avec contrats actifs (matricules: " . implode(', ', $employeesWithContracts) . ")",
+            ]);
+
+            return redirect()->route('employes')->with([
+                $deletedCount > 0 ? 'success' : 'error' => $errorMessage,
+                'deleted_count' => $deletedCount,
+                'blocked_count' => count($employeesWithContracts)
+            ]);
+        }
+
+        return redirect()->route('employes')->with(['success' => 'Les employés sélectionnés ont été supprimés avec succès']);
     }
 }

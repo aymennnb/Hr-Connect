@@ -733,7 +733,6 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
                         )}
                     </div>
 
-                    {/* Modals */}
                     {showAddForm && (
                         <ModalWrapper title="Ajouter un nouveau employé" onClose={() => setShowAddForm(false)}>
                             <AddEmploye 

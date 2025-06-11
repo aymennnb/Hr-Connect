@@ -19,13 +19,22 @@ class CongeController extends Controller
 
         if ($currentUser->role === 'superadmin') {
             $conges = Conge::with('user')->latest()->get();
-        } else {
+        } elseif ($currentUser->role === 'admin') {
             $conges = Conge::with('user')
                 ->whereHas('user', function ($query) {
-                    $query->whereNotIn('role', ['superadmin', 'admin', 'manager']);
+                    $query->whereIn('role', ['manager', 'user']);
                 })
                 ->latest()
                 ->get();
+        } elseif ($currentUser->role === 'manager') {
+            $conges = Conge::with('user')
+                ->whereHas('user', function ($query) {
+                    $query->where('role', 'user');
+                })
+                ->latest()
+                ->get();
+        } else {
+            $conges = collect();
         }
 
         return Inertia::render('Conges/IndexConges', ['conges' => $conges]);
@@ -53,7 +62,7 @@ class CongeController extends Controller
             'message' => "a demandé un congé du {$conge->date_debut} au {$conge->date_fin}",
         ]);
 
-        return redirect()->route('conges.public')->with('success', 'Demande de congé enregistrée avec succès.');
+        return redirect()->route('conges.public')->with(['success'=> 'Demande de congé enregistrée avec succès']);
     }
 
     public function update(CongeUpdateRequest $request)
@@ -61,7 +70,7 @@ class CongeController extends Controller
         $item = Conge::find($request->id);
 
         if (!$item) {
-            return redirect()->route('conges')->with(['error' => 'Congé non trouvé.']);
+            return redirect()->route('conges')->with(['error' => 'Congé non trouvé']);
         }
 
         $item->motif = $request->motif;
@@ -76,10 +85,10 @@ class CongeController extends Controller
             'role' => Auth::user()->role,
             'action' => 'update',
             'type' => 'conges',
-            'message' => "a modifié les informations d'un congé avec l'ID {$item->id}.",
+            'message' => "a modifié les informations d'un congé avec l'ID {$item->id}",
         ]);
 
-        return redirect()->route('conges.public')->with(['success' => 'Le congé a été mis à jour avec succès.']);
+        return redirect()->route('conges.public')->with(['success' => 'Le congé a été mis à jour avec succès']);
     }
 
     public function accept($id)
@@ -95,10 +104,10 @@ class CongeController extends Controller
             'role' => Auth::user()->role,
             'action' => 'accept',
             'type' => 'conges',
-            'message' => "a accepté le congé demandé par {$userName} dont l'ID est {$conge->id}."
+            'message' => "a accepté le congé demandé par {$userName} dont l'ID est {$conge->id}"
         ]);
 
-        return redirect()->route('conges')->with(['success'=> 'Congé accepté avec succès.']);
+        return redirect()->route('conges')->with(['success'=> 'Congé accepté avec succès']);
     }
 
     public function refuse($id)
@@ -114,10 +123,10 @@ class CongeController extends Controller
             'role' => Auth::user()->role,
             'action' => 'refuse',
             'type' => 'conges',
-            'message' => "a refusé le congé demandé par {$userName} dont l'ID est {$conge->id}."
+            'message' => "a refusé le congé demandé par {$userName} dont l'ID est {$conge->id}"
         ]);
 
-        return redirect()->route('conges')->with(['success'=> 'Congé refusé avec succès.']);
+        return redirect()->route('conges')->with(['success'=> 'Congé refusé avec succès']);
     }
 
     public function delete($id)
@@ -125,7 +134,7 @@ class CongeController extends Controller
         $conge = Conge::where('id', $id)->first();
 
         if (!$conge) {
-            return redirect()->route('conges.public')->with(['error' => 'Congé non trouvé.']);
+            return redirect()->route('conges.public')->with(['error' => 'Congé non trouvé']);
         }
 
         if ($conge->user_id !== auth()->id()) {
@@ -139,10 +148,10 @@ class CongeController extends Controller
             'role' => auth()->user()->role,
             'action' => 'delete',
             'type' => 'conges',
-            'message' => "a annulé une demande de congé du {$conge->date_debut} au {$conge->date_fin} dont l'ID est {$conge->id}.",
+            'message' => "a annulé une demande de congé du {$conge->date_debut} au {$conge->date_fin} dont l'ID est {$conge->id}",
         ]);
 
-        return redirect()->route('conges.public')->with(['success' => "Le congé a été annulé avec succès."]);
+        return redirect()->route('conges.public')->with(['success' => "Le congé a été annulé avec succès"]);
     }
 
     public function indexpublic() 

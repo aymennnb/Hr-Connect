@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\CongeController;
+use App\Http\Controllers\ContratsController;
 use App\Http\Controllers\DepartementController;
 use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\EmployesController;
@@ -93,6 +94,12 @@ Route::middleware(['auth','verified'])->group(function () {
                 Route::get('/', 'index')->name('conges');
                 Route::post('accept/{id}', 'accept')->name('conges.accept');
                 Route::post('refuse/{id}', 'refuse')->name('conges.refuse');
+            });
+
+            Route::prefix('contrats')->controller(ContratsController::class)->group(function () {
+                Route::get('/', 'index')->name('contrats');
+                Route::post('create', 'create')->name('contrats.create');
+                Route::delete('delete/{id}', 'delete')->name('contrats.delete');
             });
 
             Route::prefix('employes')->controller(EmployesController::class)->group(function () {

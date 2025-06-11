@@ -34,8 +34,8 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
 
     const filterRelations = {
         roles: {
-            all: ["conges", "salaires", "departements","utilisateurs"],
-            admin: ["conges", "salaires", "departements","utilisateurs"],
+            all: ["conges", "salaires", "departements","user"],
+            admin: ["conges", "salaires", "departements","user"],
             manager: ["conges", "salaires", "departements"],
             user: []
         },
@@ -316,8 +316,8 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
                                     >
                                         <option value="all">Tous</option>
                                         <option value="admin">Admin</option>
-                                        <option value="manager">Manager</option>
-                                        <option value="user">Utilisateur</option>
+                                        <option value="manager">Rsponsable RH</option>
+                                        <option value="user">Employé</option>
                                     </select>
                                 </div>
 

@@ -79,12 +79,16 @@ export default function IndexConges({ auth, conges, users, flash }) {
 
         if (modalConge.action === 'accept') {
             router.post(route('conges.accept', { id }), {}, options);
+            closeCongeModal();
         } else if (modalConge.action === 'refuse') {
             router.post(route('conges.refuse', { id }), {}, options);
+            closeCongeModal();
         } else if (modalConge.action === 'cancel') {
             router.post(route('conges.cancel', { id }), {}, options);
+            closeCongeModal();
         } else if (modalConge.action === 'delete') {
             router.delete(route('conges.delete', { id }), options);
+            closeCongeModal();
         }
     };
 

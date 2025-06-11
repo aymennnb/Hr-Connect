@@ -20,7 +20,6 @@ class Contract extends Model
         'titre',
         'date_debut',
         'date_fin',
-        'statut',
         'salaire_mensuel',
         'taux_horaire',
         'taux_heures_supp',

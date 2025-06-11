@@ -29,8 +29,7 @@ class UserUpdateRequest extends FormRequest
                 'min:8',
                 'regex:/[a-z]/',
                 'regex:/[A-Z]/',
-                'regex:/[0-9]/',
-                'regex:/[@$!%*?&]/',
+                'regex:/[0-8]/'
             ],
         ];
     }
@@ -54,7 +53,7 @@ class UserUpdateRequest extends FormRequest
 
             'password.string' => 'Le mot de passe doit être une chaîne de caractères.',
             'password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
-            'password.regex' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&).',
+            'password.regex' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule.',
         ];
     }
 }

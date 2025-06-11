@@ -2,21 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import NavLink from "@/Components/NavLink";
 import { Link } from "@inertiajs/react";
 import { Toaster } from "react-hot-toast";
-import { router } from '@inertiajs/react';
 import LoadingSpinner from "@/Components/Loader";
 import { FaRegCalendarAlt, FaSuitcase } from "react-icons/fa";
-import { FaMapLocation } from "react-icons/fa6";
 import { MdSpaceDashboard } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
 import { FaRegNewspaper } from "react-icons/fa";
 import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
 import {useWindowWidth} from "@/hooks/useWindowWidth.js";
-import { FaBuildingCircleArrowRight } from "react-icons/fa6";
 import { FaMoneyBillWave } from "react-icons/fa6";
 import { FaUsersLine } from "react-icons/fa6";
-import { FaFileAlt } from "react-icons/fa";
-import { FaUserEdit } from "react-icons/fa";
+import { TbContract } from "react-icons/tb";
+
 
 export default function Authenticated({ user, header, children }) {
     const [showDropdown, setShowDropdown] = useState(false);
@@ -145,7 +142,7 @@ export default function Authenticated({ user, header, children }) {
                         </div>
                         }
                     </NavLink>
-                    <NavLink href={route("conges.public")} active={route().current("conges.public")} >
+                    <NavLink href={route("conges.public")} >
                             <div className="flex text-blue-600 items-center gap-2">
                                 <FaRegCalendarAlt style={{ color: colors.primary }} />
                                 <span>Espace Personnel</span>
@@ -157,7 +154,7 @@ export default function Authenticated({ user, header, children }) {
                                 <span>Mes congés</span>
                             </div>
                     </NavLink>
-                    <NavLink href={route("dashboard")} active={route().current("conges")} >
+                    <NavLink href={route("dashboard")} >
                             <div className="flex text-blue-600 items-center gap-2">
                                 <FaRegCalendarAlt style={{ color: colors.primary }} />
                                 <span>Mes salaires</span>
@@ -181,10 +178,17 @@ export default function Authenticated({ user, header, children }) {
                                 </div>
                             </NavLink>
                             
+                            <NavLink href={route("contrats")} active={route().current("contrats")}>
+                                <div className="flex text-blue-600 items-center gap-2">
+                                    <TbContract style={{ color: colors.primary }} />
+                                    <span>Contrats</span>
+                                </div>
+                            </NavLink>
+                            
                             <NavLink href={route("conges")} active={route().current("conges")}>
                                 <div className="flex text-blue-600 items-center gap-2">
                                     <FaRegCalendarAlt style={{ color: colors.primary }} />
-                                    <span>Gestion des congés</span>
+                                    <span>Congés</span>
                                 </div>
                             </NavLink>
                             
