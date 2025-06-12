@@ -18,8 +18,10 @@ import { AiOutlineUserDelete } from "react-icons/ai";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { IoPersonAddOutline } from "react-icons/io5";
 import { MdOutlineLockReset } from "react-icons/md";
+import AddEmploye from "@/Pages/Utilisateurs/AddEmploye";
+import { RiUserReceived2Fill } from "react-icons/ri";
 
-export default function IndexUsers({ auth,AccessTable, documents,users, flash }) {
+export default function IndexUsers({ auth,AccessTable,departements, documents,users, flash }) {
     const { data, setData, post, processing, errors, delete: destroy } = useForm({
         users_ids:[],
         user_id: "",
@@ -63,6 +65,9 @@ export default function IndexUsers({ auth,AccessTable, documents,users, flash })
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [UserAccess, setUserAccess] = useState(null);
 
+    const [showAddEmployeeForm, setShowAddEmployeeForm] = useState(false);
+    const [userToAddAsEmployee, setUserToAddAsEmployee] = useState(null);
+
     // Fonction pour réinitialiser tous les filtres
     const resetFilters = () => {
         setData({
@@ -77,6 +82,15 @@ export default function IndexUsers({ auth,AccessTable, documents,users, flash })
         setCurrentPage(1);
     };
 
+    const isUserEmployee = (userId) => {
+        const user = users.find(u => u.id === userId);
+        return user?.is_employee || false;
+    };
+
+    const openAddEmployeeForm = (user) => {
+        setUserToAddAsEmployee(user);
+        setShowAddEmployeeForm(true);
+    };
 
 
     useEffect(() => {
@@ -662,6 +676,15 @@ export default function IndexUsers({ auth,AccessTable, documents,users, flash })
                                                 </td>
                                                 <td className="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
                                                     <div className="flex space-x-2 justify-center">
+                                                        {!isUserEmployee(user.id) && (
+                                                            <button
+                                                                onClick={() => openAddEmployeeForm(user)}
+                                                                className="text-blue-600 hover:text-blue-900 px-2 py-1 rounded bg-blue-100"
+                                                                title={`Ajouter ${user.name} comme employé`}
+                                                            >
+                                                                <RiUserReceived2Fill/>
+                                                            </button>
+                                                        )}
                                                         <button
                                                                onClick={() => openEditUser(user)}
                                                                className="text-yellow-600 hover:text-yellow-900 px-2 py-1 rounded bg-yellow-100"
@@ -738,6 +761,18 @@ export default function IndexUsers({ auth,AccessTable, documents,users, flash })
                     </div>
                 </div>
             </div>
+            {showAddEmployeeForm && userToAddAsEmployee && (
+                <ModalWrapper 
+                    title={`Ajouter ${userToAddAsEmployee.name} comme employé`}
+                    onClose={() => setShowAddEmployeeForm(false)}
+                >
+                    <AddEmploye 
+                        user={userToAddAsEmployee}
+                        setShowAddForm={setShowAddEmployeeForm}
+                        departements={departements}
+                    />
+                </ModalWrapper>
+            )}
             {showEditForm && userToEdit && (
                 <ModalWrapper 
                     title={`Modifier les informations ${

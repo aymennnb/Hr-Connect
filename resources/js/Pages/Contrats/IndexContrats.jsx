@@ -197,6 +197,7 @@ export default function IndexContrats({ auth, contracts, departments, flash }) {
             return false;
         });
     };
+    
 
     return (
         <Authenticated user={auth.user} header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Gestion des Contrats</h2>}>

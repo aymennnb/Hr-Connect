@@ -3,7 +3,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import Authenticated from '@/Layouts/AuthenticatedLayout';
 import toast from 'react-hot-toast';
 
-export default function AddNewContract({ auth, employe }) {
+export default function AddNewContract({ auth, employe,setShowAddContrat }) {
     const { flash } = usePage().props;
     const lastContract = employe.contrats?.sort((a, b) => new Date(b.date_fin) - new Date(a.date_fin))[0];
     const minStartDate = lastContract?.date_fin ? new Date(lastContract.date_fin) : new Date();
@@ -231,12 +231,12 @@ export default function AddNewContract({ auth, employe }) {
                             </div>
 
                             <div className="flex justify-end space-x-4 mt-6">
-                                <Link
-                                    href={route('contrats')}
+                                <button
+                                    onClick={()=>setShowAddContrat(false)}
                                     className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
                                 >
                                     Annuler
-                                </Link>
+                                </button>
                                 <button
                                     type="submit"
                                     disabled={processing}

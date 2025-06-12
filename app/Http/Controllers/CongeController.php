@@ -156,8 +156,28 @@ class CongeController extends Controller
 
     public function indexpublic() 
     {
+        $user = auth()->user();
+        $employe = $user->employe;
+        
+        $hasActiveContract = false;
+        if ($employe) {
+            $hasActiveContract = $employe->contrats()
+                ->where('date_debut', '<=', now())
+                ->where(function($query) {
+                    $query->where('date_fin', '>=', now())
+                        ->orWhereNull('date_fin');
+                })
+                ->exists();
+        }
+        
         $users = User::all();
         $conges = Conge::all();
-        return Inertia::render('Conges/IndexPublic', ['conges' => $conges,'users'=>$users]);
+        
+        return Inertia::render('Conges/IndexPublic', [
+            'conges' => $conges,
+            'users' => $users,
+            'employe' => $employe,
+            'hasActiveContract' => $hasActiveContract
+        ]);
     }
 }

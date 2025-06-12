@@ -62,6 +62,8 @@ Route::middleware(['auth','verified'])->group(function () {
                 Route::delete('delete/{id}','delete');
                 Route::post('Sites-delete', 'SitesDelete')->name('sites.SitesDelete');
                 Route::post('sites-import', 'importSites')->name('sites.import');
+
+                Route::get('/personal','personal')->name('espace.personal');
             });
 
             Route::prefix('documents')->controller(DocumentsController::class)->group(function(){
@@ -79,6 +81,7 @@ Route::middleware(['auth','verified'])->group(function () {
                 Route::get('Docs-export', 'export')->name('documents.export');
                 Route::get('Docs-export-csv', 'exportCSV')->name('documents.exportCSV');
             });
+            
 
             Route::prefix('departements')->controller(DepartementController::class)->group(function () {
                 Route::get('/', 'index')->name('departements');
@@ -141,6 +144,7 @@ Route::middleware(['auth','verified'])->group(function () {
             Route::post('Users-change-Role', 'changeGroupRole')->name('utilisateurs.changeGroupRole');
             Route::post('User-Access-Delete', 'SupprimerAccessDocs')->name('utilisateurs.suppAccess');
             Route::post('User-Access-Docs', 'updateAccessDocs')->name('utilisateurs.updateAccessDocs');
+            Route::post('add-employe', 'AddEmploye')->name('utilisateurs.addemploye');
         });
 
         Route::prefix('alerts')->controller(AlertController::class)->group(function(){

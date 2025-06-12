@@ -11,6 +11,7 @@ use App\Models\Departement;
 use App\Models\Alerts;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -19,7 +20,27 @@ class EmployesController extends Controller
 {
     public function index()
     {
-        $employes = Employe::with(['user', 'departement'])->get();
+        $currentUser = Auth::user();
+
+        if ($currentUser->role === 'superadmin') {
+            $employes = Employe::with(['user', 'departement'])->get();
+        } elseif ($currentUser->role === 'admin') {
+            $employes = Employe::with(['user', 'departement'])
+                ->whereHas('user', function ($query) {
+                    $query->whereIn('role', ['manager', 'user']);
+                })
+                ->get();
+        } elseif ($currentUser->role === 'manager') {
+            $employes = Employe::with(['user', 'departement'])
+                ->whereHas('user', function ($query) {
+                    $query->where('role', 'user');
+                })
+                ->get();
+        } else {
+            // Si autre rôle (par exemple un simple employé), on ne retourne rien
+            $employes = collect(); // collection vide
+        }
+
         $departements = Departement::all();
         $users = User::all();
 
@@ -29,6 +50,7 @@ class EmployesController extends Controller
             'users' => $users,
         ]);
     }
+
 
     public function create(EmployeInsertRequest $request)
     {
@@ -51,7 +73,7 @@ class EmployesController extends Controller
 
         // Création de l'employé
         $employe = Employe::create([
-            'user_id' => $user->id,
+            'user_id' => $validated['user_id'],
             'departement_id' => $validated['departement_id'],
             'matricule' => $validated['matricule'],
             'poste' => $validated['poste'],
@@ -118,45 +140,42 @@ class EmployesController extends Controller
         return Inertia::render('Employes/EditEmploye', compact('employe'));
     }
 
-    public function update(EmployeInsertRequest $request)
+    public function update(EmployeUpdateRequest $request,$id)
     {
         dd($request->all());
-        // $employe = Employe::findOrFail($id);
+    //     $employe = Employe::findOrFail($id);
+    //     $validated = $request->validated();
 
-        // $validated = $request->validate([
-        //     'departement_id' => 'nullable|exists:departements,id',
-        //     'poste' => 'nullable|string',
-        //     'date_embauche' => 'nullable|date',
-        //     'telephone' => 'nullable|string',
-        //     'adresse' => 'nullable|string',
-        //     'date_naissance' => 'nullable|date',
-        //     'ville' => 'nullable|string',
-        //     'etat_civil' => 'nullable|string',
-        //     'genre' => 'nullable|string',
-        //     'cnss' => 'nullable|string',
-        //     'cin' => 'nullable|string',
-        //     'photo' => 'nullable|image|max:2048',
-        // ]);
+    //     if ($employe->user) {
+    //         $employe->user->update([
+    //             'name' => $validated['name'],
+    //             'email' => $validated['email'],
+    //             'role' => $validated['role'],
+    //         ]);
+    //     }
 
-        // if ($request->hasFile('photo')) {
-        //     if ($employe->photo && Storage::disk('public')->exists($employe->photo)) {
-        //         Storage::disk('public')->delete($employe->photo);
-        //     }
+    //     if ($request->hasFile('photo')) {
+    //         if ($employe->photo && Storage::disk('public')->exists($employe->photo)) {
+    //             Storage::disk('public')->delete($employe->photo);
+    //         }
+            
+    //         $photoPath = $request->file('photo')->store('employesPhotos', 'public');
+    //         $validated['photo'] = $photoPath;
+    //     } else {
+    //         unset($validated['photo']);
+    //     }
 
-        //     $validated['photo'] = $request->file('photo')->store('employesPhotos', 'public');
-        // }
+    //     $employe->update($validated);
 
-        // $employe->update($validated);
+    //     Alerts::create([
+    //         'user_id' => auth()->id(),
+    //         'role' => auth()->user()->role,
+    //         'action' => 'update',
+    //         'type' => 'employe',
+    //         'message' => "a mis à jour les informations de l'employé avec le matricule {$employe->matricule}",
+    //     ]);
 
-        // Alerts::create([
-        //     'user_id' => auth()->id(),
-        //     'role' => auth()->user()->role,
-        //     'action' => 'update',
-        //     'type' => 'employe',
-        //     'message' => "a mis à jour l'employé avec le matricule {$employe->matricule}",
-        // ]);
-
-        // return redirect()->back()->with('success', 'Employé mis à jour avec succès.');
+    //     return redirect()->route('employes')->with(['success'=>'Employé mis à jour avec succès']);
     }
 
     public function delete($id)

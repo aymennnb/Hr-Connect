@@ -36,4 +36,9 @@ class Employe extends Model
     {
         return $this->belongsTo(Departement::class);
     }
+
+    public function contrats()
+    {
+        return $this->hasMany(Contract::class);
+    }
 }

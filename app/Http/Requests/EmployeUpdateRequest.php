@@ -14,7 +14,7 @@ class EmployeUpdateRequest extends FormRequest
 
     public function rules()
     {
-        $employeId = $this->route('employe');
+        $employe = $this->route('employe');
 
         return [
             'name' => 'required|string|max:255',
@@ -22,7 +22,7 @@ class EmployeUpdateRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($employeId->user_id)
+                Rule::unique('users', 'email')->ignore($employe->user_id) 
             ],
             'role' => 'required|in:user,manager,admin',
             'departement_id' => 'nullable|exists:departements,id',

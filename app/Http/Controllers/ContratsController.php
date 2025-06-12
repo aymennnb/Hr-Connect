@@ -41,6 +41,8 @@ class ContratsController extends Controller
             $contracts = collect();
         }
 
+        $users = User::with(['employe', 'employe.contrats'])->get();
+
         return Inertia::render('Contrats/IndexContrats', [
             'contracts' => $contracts,
             'departments' => $departements,

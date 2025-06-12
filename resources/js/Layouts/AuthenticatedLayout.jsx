@@ -132,8 +132,8 @@ export default function Authenticated({ user, header, children }) {
                     <NavLink href={route("dashboard")} active={route().current("dashboard")}>
                         {user.role === "user" ? 
                         <div className="flex text-blue-600 items-center gap-2">
-                            <MdSpaceDashboard style={{ color: colors.primary }} />
-                            <span>Tableau de bord</span>
+                            <FaRegCalendarAlt style={{ color: colors.primary }} />
+                            <span>Espace Personnel</span>
                         </div>
                         : 
                         <div className="flex text-blue-600 items-center gap-2">
@@ -142,12 +142,14 @@ export default function Authenticated({ user, header, children }) {
                         </div>
                         }
                     </NavLink>
-                    <NavLink href={route("conges.public")} >
+                    {user.role !== "user" && (
+                    <NavLink href={route("espace.personal")} active={route().current("espace.personal")}>
                             <div className="flex text-blue-600 items-center gap-2">
                                 <FaRegCalendarAlt style={{ color: colors.primary }} />
                                 <span>Espace Personnel</span>
                             </div>
                     </NavLink>
+                    )}
                     <NavLink href={route("conges.public")} active={route().current("conges.public")} >
                             <div className="flex text-blue-600 items-center gap-2">
                                 <FaRegCalendarAlt style={{ color: colors.primary }} />

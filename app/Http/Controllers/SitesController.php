@@ -226,9 +226,11 @@ class SitesController extends Controller
     {
         $user = Auth::user();
 
-        // Données déjà récupérées
+        // Données communes
         $users = User::all();
         $alerts = Alerts::all();
+        $totalEmployees = Employe::count();
+        $departmentsCount = Departement::count();
 
         if ($user->role === 'admin' || $user->role === 'superadmin') {
             $documents = Documents::all();
@@ -240,16 +242,29 @@ class SitesController extends Controller
             $documents = Documents::whereIn('id', $accessibleDocumentIds)->get();
         }
 
-        // --- Nouvelles données à calculer ---
+        // 🎯 Appliquer le même filtrage pour les congés :
+        if ($user->role === 'superadmin') {
+            $filteredConges = Conge::query();
+        } elseif ($user->role === 'admin') {
+            $filteredConges = Conge::whereHas('user', function ($query) {
+                $query->whereIn('role', ['manager', 'user']);
+            });
+        } elseif ($user->role === 'manager') {
+            $filteredConges = Conge::whereHas('user', function ($query) {
+                $query->where('role', 'user');
+            });
+        } else {
+            $filteredConges = Conge::whereNull('id'); // Aucun congé pour les autres
+        }
 
-        // Total des employés
-        $totalEmployees = Employe::count();
+        // 🔢 Nombre total filtré
+        $leaveRequestsCount = (clone $filteredConges)->count();
 
-        // Nombre de départements
-        $departmentsCount = Departement::count();
-
-        // Nombre total des demandes de congé
-        $leaveRequestsCount = Conge::count();
+        // 📊 Regroupement par statut
+        $leaveRequestsByStatus = (clone $filteredConges)
+            ->select('status', \DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->get();
 
         // Employés par département
         $employeesByDepartment = Departement::withCount('employes')->get()->map(function ($dept) {
@@ -260,10 +275,8 @@ class SitesController extends Controller
             ];
         });
 
-        // Demandes de congé par statut (version simplifiée)
-        $leaveRequestsByStatus = Conge::select('status', \DB::raw('count(*) as total'))
-            ->groupBy('status')
-            ->get();
+        // Employé connecté et ses contrats
+        $employe = $user->employe()->with('contrats')->first();
 
         return Inertia::render('Dashboard', [
             'users' => $users,
@@ -274,6 +287,20 @@ class SitesController extends Controller
             'leaveRequestsCount' => $leaveRequestsCount,
             'employeesByDepartment' => $employeesByDepartment,
             'leaveRequestsByStatus' => $leaveRequestsByStatus,
+            'employe' => $employe,
+            'contrats' => $employe ? $employe->contrats : []
+        ]);
+    }
+
+
+    public function personal()
+    {
+        $user = auth()->user();
+        $employe = $user->employe()->with('contrats')->first();
+
+        return Inertia::render('personalpage', [
+            'employe' => $employe,
+            'contrats' => $employe ? $employe->contrats : []
         ]);
     }
 

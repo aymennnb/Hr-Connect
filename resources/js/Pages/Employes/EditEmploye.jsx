@@ -5,10 +5,10 @@ import { usePage } from '@inertiajs/react';
 function EditEmploye({ employe, setShowEditForm }) {
     const { auth, departements } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
-        id:employe.user.id,
+        user_id: employe.user_id,
+        id: employe.user.id,
         name: employe.user.name,
         email: employe.user.email,
-        role: employe.user.role,
         departement_id: employe.departement_id,
         matricule: employe.matricule,
         poste: employe.poste,

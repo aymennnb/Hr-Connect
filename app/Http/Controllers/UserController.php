@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddUseremploye;
+use App\Http\Requests\EmployeInsertRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\Alerts;
+use App\Models\Contract;
+use App\Models\Departement;
 use App\Models\Documents;
 use App\Models\DocumentsAccess;
+use App\Models\Employe;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,16 +19,30 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index(){
-        $users = User::all();
+    public function index() 
+    {
+        $users = User::with('employe')->get(); // Charge les employés associés
         $documents = Documents::select('id', 'title')->get();
         $AccessTable = DocumentsAccess::select('document_id', 'user_id')->get();
         $documentAccess = DocumentsAccess::with('user')->get();
+        
         return Inertia::render('Utilisateurs/IndexUsers', [
-            'users' => $users,
-            'AccessTable'=>$AccessTable,
-            'documents'=>$documents,
-            'documentAccess'=>$documentAccess
+            'users' => $users->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'email_verified_at' => $user->email_verified_at,
+                    'created_at' => $user->created_at,
+                    'updated_at' => $user->updated_at,
+                    'is_employee' => $user->employe !== null,
+                ];
+            }),
+            'AccessTable' => $AccessTable,
+            'documents' => $documents,
+            'documentAccess' => $documentAccess,
+            'departements' => Departement::all(),
         ]);
     }
 
@@ -264,4 +283,59 @@ class UserController extends Controller
             default => $role,
         };
     }
+
+    public function AddEmploye(AddUseremploye $request)
+    {
+        $validated = $request->validated();
+
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('employes/photos', 'public');
+        }
+
+        $employe = Employe::create([
+            'user_id' => $request->user_id,
+            'email' => $validated['email'],
+            'departement_id' => $validated['departement_id'],
+            'matricule' => $validated['matricule'],
+            'poste' => $validated['poste'],
+            'date_embauche' => $validated['date_embauche'],
+            'telephone' => $validated['telephone'],
+            'adresse' => $validated['adresse'],
+            'date_naissance' => $validated['date_naissance'],
+            'ville' => $validated['ville'],
+            'etat_civil' => $validated['etat_civil'],
+            'genre' => $validated['genre'],
+            'cnss' => $validated['cnss'],
+            'cin' => $validated['cin'],
+            'photo' => $photoPath,
+        ]);
+
+        $documentPath = null;
+        if ($request->hasFile('contract_document_path')) {
+            $documentPath = $request->file('contract_document_path')->store('contracts', 'public');
+        }
+
+        $contract = Contract::create([
+            'reference' => $validated['contract_reference'],
+            'type_contrat' => $validated['contract_type'],
+            'titre' => $validated['contract_titre'],
+            'poste' => $validated['poste'],
+            'date_debut' => $validated['contract_date_debut'],
+            'date_fin' => $validated['contract_date_fin'] ?? null,
+            'salaire_mensuel' => $validated['contract_salaire_mensuel'] ?? 0,
+            'taux_horaire' => $validated['contract_taux_horaire'] ?? 0,
+            'taux_heures_supp' => $validated['contract_taux_heures_supp'] ?? 0,
+            'montant_fixe' => $validated['contract_montant_fixe'] ?? 0,
+            'mode_paiement' => $validated['contract_mode_paiement'],
+            'employe_id' => $employe->id,
+            'document_path' => $documentPath,
+            'created_by' => auth()->id(),
+        ]);
+
+        return redirect()->route('utilisateurs')->with([
+            'success' => 'Employé et contrat pour l\'employé avec le matricule ' . $employe->matricule . ' ajoutés avec succès.',
+        ]);
+    }
+
 }

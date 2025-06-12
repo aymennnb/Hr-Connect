@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class EmployeInsertRequest extends FormRequest
+class AddUseremploye extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,16 +23,12 @@ class EmployeInsertRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'name' => 'required|string|max:255|unique:users,name',
+            'user_id' => 'required|exists:users,id',
             'email' => [
                 'required',
                 'email',
                 'max:255',
-                'unique:users,email'
             ],
-            'password' => 'required|string|min:8',
-            'role' => 'required|in:user,manager,admin',
-            
             'departement_id' => 'nullable|exists:departements,id',
             'matricule' => 'required|unique:employes,matricule',
             'poste' => 'required|string|max:100',
