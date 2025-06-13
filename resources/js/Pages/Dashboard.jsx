@@ -253,6 +253,12 @@ const recentActivitiesData = alerts
                                                         </p>
                                                     </div><br />
                                                     <div className="md:col-span-2">
+                                                        <h4 className="text-sm font-medium text-gray-500">Mode de paiement</h4>
+                                                        <p className="mt-1 text-sm text-gray-900 capitalize">
+                                                            {currentContrat.mode_paiement}
+                                                        </p>
+                                                    </div>
+                                                    <div className="md:col-span-2">
                                                         <h4 className="text-sm font-medium text-gray-500">
                                                             {currentContrat.mode_paiement === 'mensuel' && 'Salaire mensuel'}
                                                             {currentContrat.mode_paiement === 'horaire' && 'Salaire horaire'}
@@ -261,12 +267,6 @@ const recentActivitiesData = alerts
                                                         <p className="mt-1 text-sm text-gray-900">
                                                             {currentContrat.salaire_mensuel} MAD
                                                             {currentContrat.mode_paiement === 'horaire' && ' / heure'}
-                                                        </p>
-                                                    </div>
-                                                    <div className="md:col-span-2">
-                                                        <h4 className="text-sm font-medium text-gray-500">Mode de paiement</h4>
-                                                        <p className="mt-1 text-sm text-gray-900 capitalize">
-                                                            {currentContrat.mode_paiement}
                                                         </p>
                                                     </div>
                                                 </div>

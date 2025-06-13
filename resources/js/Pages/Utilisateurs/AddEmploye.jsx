@@ -370,6 +370,7 @@ function AddEmploye({ setShowAddForm, user, departements }) {
                                     <input
                                         type="number"
                                         step="0.01"
+                                        min={0}
                                         className="w-full border rounded px-3 py-1"
                                         value={data.contract_salaire_mensuel}
                                         onChange={(e) => setData('contract_salaire_mensuel', e.target.value)}
@@ -387,6 +388,7 @@ function AddEmploye({ setShowAddForm, user, departements }) {
                                         <input
                                             type="number"
                                             step="0.01"
+                                            min={0}
                                             className="w-full border rounded px-3 py-1"
                                             value={data.contract_taux_horaire}
                                             onChange={(e) => setData('contract_taux_horaire', e.target.value)}
@@ -400,6 +402,7 @@ function AddEmploye({ setShowAddForm, user, departements }) {
                                         <input
                                             type="number"
                                             step="0.01"
+                                            min={0}
                                             className="w-full border rounded px-3 py-1"
                                             value={data.contract_taux_heures_supp}
                                             onChange={(e) => setData('contract_taux_heures_supp', e.target.value)}
@@ -417,6 +420,7 @@ function AddEmploye({ setShowAddForm, user, departements }) {
                                     <input
                                         type="number"
                                         step="0.01"
+                                        min={0}
                                         className="w-full border rounded px-3 py-1"
                                         value={data.contract_montant_fixe}
                                         onChange={(e) => setData('contract_montant_fixe', e.target.value)}

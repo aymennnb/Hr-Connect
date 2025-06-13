@@ -18,6 +18,8 @@ function AddConges({ auth, setShowAddForm }) {
         });
     };
 
+    const today = new Date().toISOString().split('T')[0];
+    
     return (
         <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -46,6 +48,7 @@ function AddConges({ auth, setShowAddForm }) {
                             <input
                                 id="date_debut"
                                 type="date"
+                                min={today}
                                 className="w-full border rounded px-3 py-1"
                                 value={data.date_debut}
                                 onChange={(e) => setData("date_debut", e.target.value)}

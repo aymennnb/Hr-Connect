@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Employe;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,17 +15,19 @@ class EmployeUpdateRequest extends FormRequest
 
     public function rules()
     {
-        $employe = $this->route('employe');
+        $employeId = $this->route('employe') ?? $this->input('id');
+        $employe = Employe::find($employeId);
 
         return [
+            'id' => 'required|exists:employes,id',
+            'user_id' => 'required|exists:users,id',
             'name' => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($employe->user_id) 
+                Rule::unique('users', 'email')->ignore($employe->user_id)
             ],
-            'role' => 'required|in:user,manager,admin',
             'departement_id' => 'nullable|exists:departements,id',
             'matricule' => 'required|string|max:50',
             'poste' => 'required|string|max:255',

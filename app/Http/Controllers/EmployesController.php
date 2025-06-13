@@ -37,8 +37,7 @@ class EmployesController extends Controller
                 })
                 ->get();
         } else {
-            // Si autre rôle (par exemple un simple employé), on ne retourne rien
-            $employes = collect(); // collection vide
+            $employes = collect();
         }
 
         $departements = Departement::all();
@@ -54,7 +53,6 @@ class EmployesController extends Controller
 
     public function create(EmployeInsertRequest $request)
     {
-        // dd($request->all());
         $validated = $request->validated();
         
         // Création de l'utilisateur
@@ -73,7 +71,7 @@ class EmployesController extends Controller
 
         // Création de l'employé
         $employe = Employe::create([
-            'user_id' => $validated['user_id'],
+            'user_id' => $user->id,
             'departement_id' => $validated['departement_id'],
             'matricule' => $validated['matricule'],
             'poste' => $validated['poste'],
@@ -114,7 +112,6 @@ class EmployesController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        // Création des alertes
         Alerts::create([
             'user_id' => auth()->id(),
             'role' => auth()->user()->role,
@@ -142,40 +139,38 @@ class EmployesController extends Controller
 
     public function update(EmployeUpdateRequest $request,$id)
     {
-        dd($request->all());
-    //     $employe = Employe::findOrFail($id);
-    //     $validated = $request->validated();
+        $employe = Employe::findOrFail($id);
+        $validated = $request->validated();
 
-    //     if ($employe->user) {
-    //         $employe->user->update([
-    //             'name' => $validated['name'],
-    //             'email' => $validated['email'],
-    //             'role' => $validated['role'],
-    //         ]);
-    //     }
+        if ($employe->user) {
+            $employe->user->update([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+            ]);
+        }
 
-    //     if ($request->hasFile('photo')) {
-    //         if ($employe->photo && Storage::disk('public')->exists($employe->photo)) {
-    //             Storage::disk('public')->delete($employe->photo);
-    //         }
+        if ($request->hasFile('photo')) {
+            if ($employe->photo && Storage::disk('public')->exists($employe->photo)) {
+                Storage::disk('public')->delete($employe->photo);
+            }
             
-    //         $photoPath = $request->file('photo')->store('employesPhotos', 'public');
-    //         $validated['photo'] = $photoPath;
-    //     } else {
-    //         unset($validated['photo']);
-    //     }
+            $photoPath = $request->file('photo')->store('employesPhotos', 'public');
+            $validated['photo'] = $photoPath;
+        } else {
+            unset($validated['photo']);
+        }
 
-    //     $employe->update($validated);
+        $employe->update($validated);
 
-    //     Alerts::create([
-    //         'user_id' => auth()->id(),
-    //         'role' => auth()->user()->role,
-    //         'action' => 'update',
-    //         'type' => 'employe',
-    //         'message' => "a mis à jour les informations de l'employé avec le matricule {$employe->matricule}",
-    //     ]);
+        Alerts::create([
+            'user_id' => auth()->id(),
+            'role' => auth()->user()->role,
+            'action' => 'update',
+            'type' => 'employe',
+            'message' => "a mis à jour les informations de l'employé avec le matricule {$employe->matricule}",
+        ]);
 
-    //     return redirect()->route('employes')->with(['success'=>'Employé mis à jour avec succès']);
+        return redirect()->route('employes')->with(['success'=>"Employé avec le matricule {$employe->matricule} a mis à jour avec succès"]);
     }
 
     public function delete($id)

@@ -14,6 +14,9 @@ import { RxCross2 } from "react-icons/rx";
 import { TiDocumentAdd } from "react-icons/ti";
 import ConfirmContratAnnuler from "@/Components/ConfirmContratAnnuler";
 import AddNewContract from "./AddNewContract";
+import ContratDetailsModal from "./DetailsContrat";
+import { CgDetailsMore } from "react-icons/cg";
+import DetailsContrat from "./DetailsContrat";
 
 
 export default function IndexContrats({ auth, contracts, departments, flash }) {
@@ -37,6 +40,9 @@ export default function IndexContrats({ auth, contracts, departments, flash }) {
     
     const [showAddContrat, setShowAddContrat] = useState(false);
     const [employeToAddNewContrat, setEmployeToAddNewContrat] = useState(null);
+
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [contratToShowDetails, setContratToShowDetails] = useState(null); 
 
     const resetFilters = () => {
         setData({
@@ -407,7 +413,17 @@ export default function IndexContrats({ auth, contracts, departments, flash }) {
                                                     </td>
                                                     <td className="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
                                                         <div className="flex space-x-2 justify-center">
-                                                            {/* Bouton Ajouter nouveau contrat (visible seulement si contrat expiré) */}
+                                                            <button
+                                                                onClick={() => {
+                                                                    setShowDetailModal(true);
+                                                                    setContratToShowDetails(contract);
+                                                                }}
+                                                                title={`Voir les détails du contrat`}
+                                                                className="text-indigo-600 hover:text-indigo-900 px-2 py-1 rounded bg-indigo-100"
+                                                            >
+                                                                <CgDetailsMore />
+                                                            </button>
+                                                            {/* Détermination des conditions */}
                                                             {status === 'expire' && !employeHasActiveOrFutureContract(contract.employe) && (
                                                                 <button
                                                                     onClick={() => {
@@ -417,11 +433,10 @@ export default function IndexContrats({ auth, contracts, departments, flash }) {
                                                                     className="text-blue-600 hover:text-blue-900 px-2 py-1 rounded bg-blue-100"
                                                                     title="Ajouter un nouveau contrat"
                                                                 >
-                                                                    <TiDocumentAdd size={16}/>
+                                                                    <TiDocumentAdd size={16} />
                                                                 </button>
                                                             )}
-                                                            
-                                                            {/* Bouton Supprimer (visible seulement si contrat futur) */}
+
                                                             {status === 'futur' && (
                                                                 <button
                                                                     onClick={() => handleDeleteClick(contract)}
@@ -433,6 +448,7 @@ export default function IndexContrats({ auth, contracts, departments, flash }) {
                                                             )}
                                                         </div>
                                                     </td>
+
                                                     
                                                 </tr>
                                             );
@@ -492,6 +508,26 @@ export default function IndexContrats({ auth, contracts, departments, flash }) {
                         contratsInfo={contractToDelete}
                     />
                 )}
+
+                {showDetailModal && (
+                    <ModalWrapper 
+                        title={`Détails du contrat ${contratToShowDetails?.employe?.user?.name ? 'de ' + contratToShowDetails.employe.user.name : ''}`}
+                        onClose={() => {
+                            setShowDetailModal(false);
+                            setContratToShowDetails(null);
+                        }}
+                    >
+                        {contratToShowDetails && (
+                            <DetailsContrat
+                                contrat={contratToShowDetails}
+                                onClose={() => {
+                                    setShowDetailModal(false);
+                                    setContratToShowDetails(null);
+                                }}
+                            />
+                        )}
+                    </ModalWrapper>
+                )}
                 
                 {showAddContrat && employeToAddNewContrat && (
                             <ModalWrapper 
@@ -507,6 +543,7 @@ export default function IndexContrats({ auth, contracts, departments, flash }) {
                                         setShowAddContrat(false);
                                         setEmployeToAddNewContrat(null);
                                     }}
+                                    setShowAddContrat={setShowAddContrat}
                                 />
                             </ModalWrapper>
                 )}

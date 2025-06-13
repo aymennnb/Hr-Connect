@@ -180,6 +180,8 @@ export default function IndexPublic({ auth, conges,hasActiveContract, users, fla
         }
     }, [flash]);
 
+    const hasPendingConge = myConges.some(conge => conge.status === 'en_attente');
+
     return (
         <Authenticated user={auth.user} header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Mes Demandes de Congés</h2>}>
             <Head title="Mes Demandes de Congés" />
@@ -205,13 +207,17 @@ export default function IndexPublic({ auth, conges,hasActiveContract, users, fla
                         <div className="p-6 bg-white border-b border-gray-200">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="mr-1 text-lg font-medium text-gray-900">Liste de mes demandes de congés</h3>
-                                <button
-                                    onClick={() => setShowAddForm(true)}
-                                    title="Demander un nouveau congé"
-                                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-                                >
-                                    <span className="flex justify-center items-center"><BsPlusCircle className="mr-2" />&nbsp; Nouvelle Demande</span>
-                                </button>
+                                {!hasPendingConge && (
+                                    <button
+                                        onClick={() => setShowAddForm(true)}
+                                        title="Demander un nouveau congé"
+                                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                                    >
+                                        <span className="flex justify-center items-center">
+                                            <BsPlusCircle className="mr-2" />&nbsp; Nouvelle Demande
+                                        </span>
+                                    </button>
+                                )}
                             </div>
 
                             {/* Filtres */}

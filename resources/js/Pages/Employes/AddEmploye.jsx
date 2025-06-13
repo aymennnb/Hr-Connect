@@ -385,11 +385,12 @@ function AddEmploye({ setShowAddForm }) {
                             {data.contract_mode_paiement === 'mensuel' && (
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2">
-                                        Salaire mensuel (€)
+                                        Salaire mensuel (MAD)
                                     </label>
                                     <input
                                         type="number"
                                         step="0.01"
+                                        min={0}
                                         className="w-full border rounded px-3 py-1"
                                         value={data.contract_salaire_mensuel}
                                         onChange={(e) => setData('contract_salaire_mensuel', e.target.value)}
@@ -402,11 +403,12 @@ function AddEmploye({ setShowAddForm }) {
                                 <>
                                     <div>
                                         <label className="block text-gray-700 text-sm font-bold mb-2">
-                                            Taux horaire (€)
+                                            Taux horaire (MAD)
                                         </label>
                                         <input
                                             type="number"
                                             step="0.01"
+                                            min={0}
                                             className="w-full border rounded px-3 py-1"
                                             value={data.contract_taux_horaire}
                                             onChange={(e) => setData('contract_taux_horaire', e.target.value)}
@@ -415,11 +417,12 @@ function AddEmploye({ setShowAddForm }) {
                                     </div>
                                     <div>
                                         <label className="block text-gray-700 text-sm font-bold mb-2">
-                                            Taux heures supplémentaires (€)
+                                            Taux heures supplémentaires (MAD)
                                         </label>
                                         <input
                                             type="number"
                                             step="0.01"
+                                            min={0}
                                             className="w-full border rounded px-3 py-1"
                                             value={data.contract_taux_heures_supp}
                                             onChange={(e) => setData('contract_taux_heures_supp', e.target.value)}
@@ -432,11 +435,12 @@ function AddEmploye({ setShowAddForm }) {
                             {data.contract_mode_paiement === 'forfaitaire' && (
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2">
-                                        Montant fixe (€)
+                                        Montant fixe (MAD)
                                     </label>
                                     <input
                                         type="number"
                                         step="0.01"
+                                        min={0}
                                         className="w-full border rounded px-3 py-1"
                                         value={data.contract_montant_fixe}
                                         onChange={(e) => setData('contract_montant_fixe', e.target.value)}

@@ -34,15 +34,18 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
 
     const filterRelations = {
         roles: {
-            all: ["conges", "salaires", "departements","user"],
-            admin: ["conges", "salaires", "departements","user"],
-            manager: ["conges", "salaires", "departements"],
-            user: []
+            all: ["user", "connecte", "contrat", "employe", "departements", "conges"],
+            admin: ["user", "connecte", "contrat", "employe", "departements", "conges"],
+            manager: ["user", "connecte", "contrat", "employe", "departements", "conges"],
+            user: ["connecte", "conges"]
         },
         types: {
-            conge: ["add", "update", "delete"],
-            salaire: ["add", "update", "delete"],
-            user: ["add", "update", "delete"]
+            user: ["updaterole", "add", "delete", "update"],
+            connecte: [],
+            contrat: ["add", "delete", "update"],
+            employe: ["add", "delete", "update","try-delete"],
+            departements: ["add", "delete", "update","try-delete"],
+            conges: ["add", "delete", "update", "accept", "refuse"]
         }
     };
 
@@ -168,25 +171,26 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
     // Fonction pour traduire les valeurs d'action en texte pour l'interface
     const getActionLabel = (actionValue) => {
         const actionLabels = {
-            'connecte': 'Connexion',
+            'updaterole': 'Changement de rôle',
             'add': 'Ajout',
-            'update': 'Modification',
             'delete': 'Suppression',
-            'updateAccessRetire': 'Retirer l\'accès',
-            'updateAccessLimit': 'Limiter l\'accès',
-            'reset': 'Réinitialisation',
-            'updaterole': 'Changement du rôle',
-            'export': 'Export',
-            'consultation': 'Consultation'
+            'update': 'Modification',
+            'accept': 'Acceptation',
+            'refuse': 'Refus',
+            'try-delete': 'Tentative de suppression',
+            'connecte': 'Connexion'
         };
         return actionLabels[actionValue] || actionValue;
     };
 
     const getTypeLabel = (typeValue) => {
         const typeLabels = {
-            'document': 'Document',
-            'site': 'Site',
-            'user': 'Utilisateur'
+            'user': 'Utilisateur',
+            'connecte': 'Connexion',
+            'contrat': 'Contrat',
+            'employe': 'Employé',
+            'departements': 'Département',
+            'conges': 'Congé'
         };
         return typeLabels[typeValue] || typeValue;
     };
@@ -316,7 +320,7 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
                                     >
                                         <option value="all">Tous</option>
                                         <option value="admin">Admin</option>
-                                        <option value="manager">Rsponsable RH</option>
+                                        <option value="manager">Responsable RH</option>
                                         <option value="user">Employé</option>
                                     </select>
                                 </div>
@@ -330,7 +334,7 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
                                         name="type"
                                         value={data.type}
                                         onChange={handleFilterChange}
-                                        disabled={data.role === 'user' || availableTypes.length === 0}
+                                        disabled={availableTypes.length === 0}
                                     >
                                         <option value="all">Tous</option>
                                         {availableTypes.map(type => (

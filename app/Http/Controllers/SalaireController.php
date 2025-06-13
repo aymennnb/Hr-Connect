@@ -11,4 +11,9 @@ class SalaireController extends Controller
     {
         return Inertia::render('Salaires/IndexSalaires');
     }
+    
+    public function indexPublic()
+    {
+        return Inertia::render('Salaires/indexPublic');
+    }
 }

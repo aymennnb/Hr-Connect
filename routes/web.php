@@ -51,6 +51,10 @@ Route::middleware(['auth','verified'])->group(function () {
         Route::post('cancel/{id}', 'cancel')->name('conges.cancel');
     });
 
+    Route::prefix('salaires')->controller(SalaireController::class)->group(function () {
+                Route::get('/mes-slaires', 'indexPublic')->name('salaires.public');
+            });
+
     Route::middleware('CheckRole:manager,admin,superadmin')->group(function () {
             Route::prefix('sites')->controller(SitesController::class)->group(function(){
                 Route::get('/','index')->name('sites');
@@ -120,7 +124,7 @@ Route::middleware(['auth','verified'])->group(function () {
                 Route::inertia('add', 'Employes/AddEmploye')->name('employes.add');
                 Route::post('create', 'create')->name('employes.create');
                 Route::get('edit/{id}', 'edit')->name('employes.edit');
-                Route::post('update', 'update')->name('employes.update');
+                Route::post('update/{id}', 'update')->name('employes.update');
                 Route::delete('delete/{id}', 'delete')->name('employes.delete');
                 Route::post('employes-delete', 'bulkDelete')->name('employes.bulkDelete');
             });

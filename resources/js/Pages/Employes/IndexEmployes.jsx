@@ -13,12 +13,13 @@ import { FaBackward } from "react-icons/fa6";
 import { TbUserEdit } from "react-icons/tb";
 import { TiDeleteOutline } from "react-icons/ti";
 import { BsPersonAdd } from "react-icons/bs";
-import { CgDetailsMore } from "react-icons/cg";
 import { TfiImport } from "react-icons/tfi";
 import { FiSearch } from "react-icons/fi";
 import { useWindowWidth } from "@/hooks/useWindowWidth.js";
 import MultiSelectDropdown from "@/Components/MultiSelectDropdown";
 import { LiaUserEditSolid } from "react-icons/lia";
+import DetailsEmploye from '@/Pages/Employes/DetailsEmploye';
+import { CgDetailsMore } from "react-icons/cg";
 
 function IndexEmployes({ auth, employes, departements, users, flash }) {
     const {
@@ -666,6 +667,16 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
                                                     <div className="flex space-x-2 justify-center">
                                                         <button
                                                             onClick={() => {
+                                                                setShowDetailModal(true);
+                                                                setEmployeToShowDetails(employe);
+                                                            }}
+                                                            title={`Consulter les détails de ${employe.user?.name}`}
+                                                            className="text-blue-600 hover:text-blue-900 px-2 py-1 rounded bg-blue-100"
+                                                        >
+                                                            <CgDetailsMore/>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
                                                                 setShowEditModal(true);
                                                                 setEmployeToEdit(employe);
                                                             }}
@@ -732,6 +743,26 @@ function IndexEmployes({ auth, employes, departements, users, flash }) {
                             </div>
                         )}
                     </div>
+
+                    {showDetailModal && (
+                        <ModalWrapper 
+                            title={`Détails de l'employé ${employeToShowDetails?.user?.name}`}
+                            onClose={() => {
+                                setShowDetailModal(false);
+                                setEmployeToShowDetails(null);
+                            }}
+                        >
+                            {employeToShowDetails && (
+                                <DetailsEmploye
+                                    employe={employeToShowDetails}
+                                    onClose={() => {
+                                        setShowDetailModal(false);
+                                        setEmployeToShowDetails(null);
+                                    }}
+                                />
+                            )}
+                        </ModalWrapper>
+                    )}
 
                     {showAddForm && (
                         <ModalWrapper title="Ajouter un nouveau employé" onClose={() => setShowAddForm(false)}>

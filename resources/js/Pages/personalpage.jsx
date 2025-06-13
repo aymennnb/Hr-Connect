@@ -304,7 +304,7 @@ export default function PersonalPage({ auth, flash, employe, contrats }) {
                                                 ) : (
                                                     <div className="bg-gray-50 rounded border border-gray-200 p-8 text-center">
                                                         <span className="italic text-gray-400">
-                                                            Aucun document
+                                                            Aucun document du contrat
                                                             disponible
                                                         </span>
                                                     </div>

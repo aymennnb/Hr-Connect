@@ -13,6 +13,9 @@ import {useWindowWidth} from "@/hooks/useWindowWidth.js";
 import { FaMoneyBillWave } from "react-icons/fa6";
 import { FaUsersLine } from "react-icons/fa6";
 import { TbContract } from "react-icons/tb";
+import { FaMoneyBills } from "react-icons/fa6";
+import { BsPersonWorkspace } from "react-icons/bs";
+import { MdEditCalendar } from "react-icons/md";
 
 
 export default function Authenticated({ user, header, children }) {
@@ -132,7 +135,7 @@ export default function Authenticated({ user, header, children }) {
                     <NavLink href={route("dashboard")} active={route().current("dashboard")}>
                         {user.role === "user" ? 
                         <div className="flex text-blue-600 items-center gap-2">
-                            <FaRegCalendarAlt style={{ color: colors.primary }} />
+                            <BsPersonWorkspace style={{ color: colors.primary }} />
                             <span>Espace Personnel</span>
                         </div>
                         : 
@@ -142,26 +145,30 @@ export default function Authenticated({ user, header, children }) {
                         </div>
                         }
                     </NavLink>
-                    {user.role !== "user" && (
-                    <NavLink href={route("espace.personal")} active={route().current("espace.personal")}>
-                            <div className="flex text-blue-600 items-center gap-2">
-                                <FaRegCalendarAlt style={{ color: colors.primary }} />
-                                <span>Espace Personnel</span>
-                            </div>
-                    </NavLink>
+                    {(user.role !== "user" && user.role !== "superadmin") && (
+                        <NavLink href={route("espace.personal")} active={route().current("espace.personal")}>
+                                <div className="flex text-blue-600 items-center gap-2">
+                                    <BsPersonWorkspace style={{ color: colors.primary }} />
+                                    <span>Espace Personnel</span>
+                                </div>
+                        </NavLink>
                     )}
-                    <NavLink href={route("conges.public")} active={route().current("conges.public")} >
+                    {user.role !== "superadmin" && (
+                        <NavLink href={route("conges.public")} active={route().current("conges.public")} >
+                                <div className="flex text-blue-600 items-center gap-2">
+                                    <MdEditCalendar style={{ color: colors.primary }} />
+                                    <span>Mes congés</span>
+                                </div>
+                        </NavLink>
+                    )}
+                    {user.role !== "superadmin" && (
+                        <NavLink href={route("salaires.public")}active={route().current("salaires.public")} >
                             <div className="flex text-blue-600 items-center gap-2">
-                                <FaRegCalendarAlt style={{ color: colors.primary }} />
-                                <span>Mes congés</span>
-                            </div>
-                    </NavLink>
-                    <NavLink href={route("dashboard")} >
-                            <div className="flex text-blue-600 items-center gap-2">
-                                <FaRegCalendarAlt style={{ color: colors.primary }} />
+                                <FaMoneyBills style={{ color: colors.primary }} />
                                 <span>Mes salaires</span>
                             </div>
-                    </NavLink>
+                        </NavLink>
+                    )}
 
                     {/* Menu pour admin/manager/superadmin */}
                     {(user.role === "admin" || user.role === "manager" || user.role === "superadmin") && (

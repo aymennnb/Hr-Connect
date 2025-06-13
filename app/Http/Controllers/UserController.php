@@ -21,7 +21,7 @@ class UserController extends Controller
 {
     public function index() 
     {
-        $users = User::with('employe')->get(); // Charge les employés associés
+        $users = User::with('employe')->get();
         $documents = Documents::select('id', 'title')->get();
         $AccessTable = DocumentsAccess::select('document_id', 'user_id')->get();
         $documentAccess = DocumentsAccess::with('user')->get();
@@ -149,17 +149,15 @@ class UserController extends Controller
             'message' => "a modifié les informations d'un " . $this->translateRole($item->role) . " avec le nom {$item->name} et l'ID {$item->id}",
         ]);
 
-        return redirect('utilisateurs')->with(['success' => "L'utilisateur {$item->name} (" . $this->translateRole($item->role) . ") a été mis à jour"]);
+        return redirect('utilisateurs')->with(['success' => "L'utilisateur {$item->name} a été mis à jour avec succès"]);
     }
 
     public function delete($id)
     {
         $item = User::findOrFail($id);
 
-        // Supprimer les accès de l'utilisateur dans la table documents_accesses
         DB::table('documents_accesses')->where('user_id', $id)->delete();
 
-        // Créer une alerte pour la suppression
         Alerts::create([
             'user_id' => auth()->user()->id,
             'role' => auth()->user()->role,
@@ -168,7 +166,6 @@ class UserController extends Controller
             'message' => "a supprimé un " . $this->translateRole($item->role) . " avec le nom {$item->name} et l'ID {$item->id}",
         ]);
 
-        // Supprimer l'utilisateur
         $item->delete();
 
         return redirect('utilisateurs')->with(['success' => "L'utilisateur {$item->name} (" . $this->translateRole($item->role) . ") a été supprimé avec succès"]);
@@ -333,8 +330,24 @@ class UserController extends Controller
             'created_by' => auth()->id(),
         ]);
 
+        Alerts::create([
+            'user_id' => auth()->id(),
+            'role' => auth()->user()->role,
+            'action' => 'add',
+            'type' => 'employe',
+            'message' => "a ajouté un employé avec le matricule {$employe->matricule}",
+        ]);
+
+        Alerts::create([
+            'user_id' => auth()->id(),
+            'role' => auth()->user()->role,
+            'action' => 'add',
+            'type' => 'contrat',
+            'message' => "a créé un contrat {$contract->type_contrat} pour l'employé {$employe->matricule}",
+        ]);
+
         return redirect()->route('utilisateurs')->with([
-            'success' => 'Employé et contrat pour l\'employé avec le matricule ' . $employe->matricule . ' ajoutés avec succès.',
+            'success' => 'Employé et contrat pour l\'employé avec le matricule ' . $employe->matricule . ' ajoutés avec succès',
         ]);
     }
 
