@@ -11,7 +11,7 @@ class Departement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'nom',
         'description',
         'uploaded_by',
         'created_by',
@@ -19,7 +19,7 @@ class Departement extends Model
 
     // Relations
 
-    public function uploadedBy()
+    public function uploaded_by_user()
     {
         return $this->belongsTo(User::class, 'uploaded_by');
     }

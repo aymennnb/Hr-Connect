@@ -393,43 +393,39 @@ export default function IndexDepartment({ auth, departements, users, flash }) {
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {getCurrentPageItems().length > 0 ? (
                                         getCurrentPageItems().map((departement) => (
-                                            <tr key={departement.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+                                            <tr key={departement.id}>
+                                                <td className="px-6 py-4 whitespace-nowrap">
                                                     <input
                                                         type="checkbox"
                                                         checked={data.departements_ids.includes(departement.id)}
                                                         onChange={() => handleSelectDepartement(departement.id)}
                                                     />
                                                 </td>
-                                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
-                                                    {departement.name || <span className="italic text-gray-400">Nom non défini</span>}
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {departement.nom}
                                                 </td>
-                                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
-                                                    {departement.description || <span className="italic text-gray-400">Aucune description</span>}
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {departement.description}
                                                 </td>
-                                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
-                                                    {users && users.find(user => Number(user.id) === Number(departement.uploaded_by))?.name || <span className="italic text-gray-400">Non trouvé</span>}
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {departement.uploaded_by_user?.name || 'N/A'}
                                                 </td>
-                                                <td className="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
-                                                    {departement.created_at ? new Date(departement.created_at).toLocaleDateString('fr-FR') : <span className="italic text-gray-400">Date inconnue</span>}
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {new Date(departement.created_at).toLocaleDateString('fr-FR')}
                                                 </td>
-                                                <td className="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
-                                                    <div className="flex space-x-2 justify-center">
-                                                        <button
-                                                            onClick={() => openEditDepartemant(departement)}
-                                                            title={`Modifier le département ${departement.name}`}
-                                                            className="text-yellow-600 hover:text-yellow-900 px-2 py-1 rounded bg-yellow-100"
-                                                        >
-                                                            <BiEdit />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteClick(departement)}
-                                                            title={`Supprimer le département ${departement.name}`}
-                                                            className="text-red-600 hover:text-red-900 px-2 py-1 rounded bg-red-100"
-                                                        >
-                                                            <TiDeleteOutline />
-                                                        </button>
-                                                    </div>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <button
+                                                        onClick={() => openEditDepartemant(departement)}
+                                                        className="text-blue-600 hover:text-blue-900 mr-3"
+                                                    >
+                                                        <BiEdit />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteClick(departement)}
+                                                        className="text-red-600 hover:text-red-900"
+                                                    >
+                                                        <TiDeleteOutline />
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))

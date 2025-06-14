@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 export default function EditDepartement({ departement, setShowEditForm }) {
     const { data, setData, post, processing, errors } = useForm({
         id: departement.id,
-        name: departement.name,
+        nom: departement.nom,
         description: departement.description || '',
     });
 
@@ -26,51 +26,51 @@ export default function EditDepartement({ departement, setShowEditForm }) {
         <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div className="p-6 bg-white border-b border-gray-200">
+                    <h3 className="text-lg font-medium mb-4">Modifier le département</h3>
                     <form onSubmit={handleSubmit}>
-                        <div className="mb-6">
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Nom du département
                             </label>
                             <input
-                                id="name"
                                 type="text"
-                                className="w-full border rounded px-3 py-1"
-                                value={data.name}
-                                onChange={(e) => setData("name", e.target.value)}
+                                value={data.nom}
+                                onChange={(e) => setData("nom", e.target.value)}
+                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                required
                             />
-                            {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
+                            {errors.nom && (
+                                <p className="mt-1 text-sm text-red-600">{errors.nom}</p>
+                            )}
                         </div>
-
-                        <div className="mb-6">
-                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Description
                             </label>
                             <textarea
-                                id="description"
-                                className="w-full border rounded px-3 py-1"
                                 value={data.description}
                                 onChange={(e) => setData("description", e.target.value)}
-                                rows={4}
+                                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                rows="4"
                             />
-                            {errors.description && <p className="mt-2 text-sm text-red-600">{errors.description}</p>}
+                            {errors.description && (
+                                <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+                            )}
                         </div>
-
-                        <div className="flex justify-end space-x-4">
+                        <div className="flex justify-end space-x-2">
                             <button
                                 type="button"
                                 onClick={() => setShowEditForm(false)}
-                                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+                                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                             >
                                 Annuler
                             </button>
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className={`px-4 py-2 bg-yellow-100 text-yellow-600 rounded-md hover:text-yellow-900 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
-                                    processing ? "opacity-75 cursor-not-allowed" : ""
-                                }`}
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                             >
-                                {processing ? "Enregistrement..." : "Mettre à jour le département"}
+                                {processing ? "Enregistrement..." : "Enregistrer"}
                             </button>
                         </div>
                     </form>

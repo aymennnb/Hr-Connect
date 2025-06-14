@@ -4,7 +4,7 @@ import { useWindowWidth } from "@/hooks/useWindowWidth.js";
 
 export default function AddDepartement({ setShowAddForm }) {
     const { data, setData, post, processing, errors } = useForm({
-        name: "",
+        nom: "",
         description: "",
     });
 
@@ -28,18 +28,18 @@ export default function AddDepartement({ setShowAddForm }) {
                         <div className="h-96 overflow-y-auto p-2">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="mb-6">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nom">
                                         Nom du département
                                     </label>
                                     <input
-                                        id="name"
+                                        id="nom"
                                         type="text"
                                         className="w-full border rounded px-3 py-1"
-                                        value={data.name}
-                                        onChange={(e) => setData("name", e.target.value)}
+                                        value={data.nom}
+                                        onChange={(e) => setData("nom", e.target.value)}
                                         placeholder="Entrez le nom du département"
                                     />
-                                    {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
+                                    {errors.nom && <p className="mt-2 text-sm text-red-600">{errors.nom}</p>}
                                 </div>
 
                                 <div className="mb-6">
