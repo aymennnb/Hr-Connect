@@ -14,7 +14,7 @@ class DepartementUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255',
+            'nom' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
         ];
     }

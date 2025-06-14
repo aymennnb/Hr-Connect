@@ -14,7 +14,7 @@ class DepartementRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255|unique:departements,name',
+            'nom' => 'required|string|max:255|unique:departements,nom',
             'description' => 'nullable|string|max:1000',
         ];
     }

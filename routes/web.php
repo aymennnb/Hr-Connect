@@ -159,6 +159,15 @@ Route::middleware(['auth','verified'])->group(function () {
 
     });
 
+    // Salary management routes
+    Route::get('/salaires', [SalaireController::class, 'index'])->name('salaires');
+    Route::post('/salaires', [SalaireController::class, 'store'])->name('salaires.store');
+    Route::put('/salaires/{id}', [SalaireController::class, 'update'])->name('salaires.update');
+    Route::delete('/salaires/{id}', [SalaireController::class, 'delete'])->name('salaires.delete');
+    
+    // Public salary view for employees
+    Route::get('/mon-salaire', [SalaireController::class, 'indexPublic'])->name('mon-salaire');
+
 });
 
 require __DIR__.'/auth.php';

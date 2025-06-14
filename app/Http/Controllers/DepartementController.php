@@ -15,12 +15,12 @@ class DepartementController extends Controller
 {
     public function index()
     {
-        $departements = Departement::all();
+        $departements = Departement::with('uploaded_by_user')->get();
         $users = User::select('id', 'name')->get();
 
         return Inertia::render('Departements/IndexDepartements', [
             'departements' => $departements,
-            'users'=>$users,
+            'users' => $users,
         ]);
     }
 
@@ -29,7 +29,7 @@ class DepartementController extends Controller
         $validated = $request->validated();
 
         $departement = Departement::create([
-            'name' => $validated['name'],
+            'nom' => $validated['nom'],
             'description' => $validated['description'] ?? null,
             'uploaded_by' => Auth::id(),
         ]);
@@ -39,10 +39,10 @@ class DepartementController extends Controller
             'role' => Auth::user()->role,
             'action' => 'add',
             'type' => 'departements',
-            'message' => "a ajouté un nouveau département {$departement->name}"
+            'message' => "a ajouté un nouveau département {$departement->nom}"
         ]);
 
-        return redirect()->route('departements')->with(['success' => "Le département {$departement->name} a été créé avec succès"]);
+        return redirect()->route('departements')->with(['success' => "Le département {$departement->nom} a été créé avec succès"]);
     }
 
     public function edit($id)
@@ -61,7 +61,7 @@ class DepartementController extends Controller
         $departement = Departement::findOrFail($request->id);
 
         $departement->update([
-            'name' => $validated['name'],
+            'nom' => $validated['nom'],
             'description' => $validated['description']
         ]);
 
@@ -70,17 +70,17 @@ class DepartementController extends Controller
             'role' => Auth::user()->role,
             'action' => 'update',
             'type' => 'departements',
-            'message' => "a mis à jour le département {$departement->name} avec l'ID {$departement->id}"
+            'message' => "a mis à jour le département {$departement->nom} avec l'ID {$departement->id}"
         ]);
 
-        return redirect()->route('departements')->with(['success' => "Le département {$departement->name} a été mis à jour avec succès"]);
+        return redirect()->route('departements')->with(['success' => "Le département {$departement->nom} a été mis à jour avec succès"]);
     }
 
 
     public function delete($id)
     {
         $departement = Departement::withCount('employes')->findOrFail($id);
-        $name = $departement->name;
+        $nom = $departement->nom;
 
         if ($departement->employes_count > 0) {
             Alerts::create([
@@ -88,11 +88,11 @@ class DepartementController extends Controller
                 'role' => Auth::user()->role,
                 'action' => 'try-delete',
                 'type' => 'departements',
-                'message' => "a tenté de supprimer le département {$name} avec l'ID {$departement->id} qui contient encore des employés"
+                'message' => "a tenté de supprimer le département {$nom} avec l'ID {$departement->id} qui contient encore des employés"
             ]);
 
             return redirect()->route('departements')->with([
-                'error' => "Impossible de supprimer le département {$name} car il contient encore des employés"
+                'error' => "Impossible de supprimer le département {$nom} car il contient encore des employés"
             ]);
         }
 
@@ -103,11 +103,11 @@ class DepartementController extends Controller
             'role' => Auth::user()->role,
             'action' => 'delete',
             'type' => 'departements',
-            'message' => "a supprimé le département {$name} avec l'ID {$departement->id}"
+            'message' => "a supprimé le département {$nom} avec l'ID {$departement->id}"
         ]);
 
         return redirect()->route('departements')->with([
-            'success' => "Le département {$name} a été supprimé avec succès"
+            'success' => "Le département {$nom} a été supprimé avec succès"
         ]);
     }
 
@@ -130,20 +130,20 @@ class DepartementController extends Controller
             }
 
             if ($departement->employes_count > 0) {
-                $departementsWithEmployees[] = $departement->name;
+                $departementsWithEmployees[] = $departement->nom;
                 
                 Alerts::create([
                     'user_id' => Auth::id(),
                     'role' => Auth::user()->role,
                     'action' => 'try-delete',
                     'type' => 'departements',
-                    'message' => "a tenté de supprimer le département {$departement->name} avec l'ID {$id} qui contient encore des employés"
+                    'message' => "a tenté de supprimer le département {$departement->nom} avec l'ID {$id} qui contient encore des employés"
                 ]);
                 
                 continue;
             }
 
-            $name = $departement->name;
+            $nom = $departement->nom;
             $departement->delete();
 
             Alerts::create([
@@ -151,7 +151,7 @@ class DepartementController extends Controller
                 'role' => Auth::user()->role,
                 'action' => 'delete',
                 'type' => 'departements',
-                'message' => "a supprimé le département {$name} avec l'ID {$id}"
+                'message' => "a supprimé le département {$nom} avec l'ID {$id}"
             ]);
 
             $deletedCount++;
