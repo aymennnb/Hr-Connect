@@ -67,7 +67,7 @@ Route::middleware(['auth','verified'])->group(function () {
                 Route::post('Sites-delete', 'SitesDelete')->name('sites.SitesDelete');
                 Route::post('sites-import', 'importSites')->name('sites.import');
 
-                Route::get('/personal','personal')->name('espace.personal');
+                Route::get('/personal','personal')->name('sites.personal');
             });
 
             Route::prefix('documents')->controller(DocumentsController::class)->group(function(){

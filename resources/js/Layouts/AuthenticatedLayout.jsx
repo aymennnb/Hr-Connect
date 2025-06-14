@@ -146,7 +146,7 @@ export default function Authenticated({ user, header, children }) {
                         }
                     </NavLink>
                     {(user.role !== "user" && user.role !== "superadmin") && (
-                        <NavLink href={route("espace.personal")} active={route().current("espace.personal")}>
+                        <NavLink href={route("sites.personal")} active={route().current("sites.personal")}>
                                 <div className="flex text-blue-600 items-center gap-2">
                                     <BsPersonWorkspace style={{ color: colors.primary }} />
                                     <span>Espace Personnel</span>
