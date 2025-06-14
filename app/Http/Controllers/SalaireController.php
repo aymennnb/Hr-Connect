@@ -25,7 +25,8 @@ class SalaireController extends Controller
 
         // Filtre par mois
         if ($request->filled('month')) {
-            $query->whereMonth('mois', $request->month);
+            $month = str_pad($request->month, 2, '0', STR_PAD_LEFT);
+            $query->whereRaw("SUBSTRING_INDEX(mois, '-', -1) = ?", [$month]);
         }
 
         // Filtre par année
