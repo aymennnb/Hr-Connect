@@ -41,4 +41,15 @@ class Employe extends Model
     {
         return $this->hasMany(Contract::class);
     }
+
+    public function currentContract()
+    {
+        return $this->hasOne(Contract::class)
+                    ->active()
+                    ->latest('date_debut');
+    }
+    public function salaires()
+    {
+        return $this->hasMany(Salaire::class);
+    }
 }

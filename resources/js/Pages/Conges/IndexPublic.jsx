@@ -10,9 +10,7 @@ import { useWindowWidth } from "@/hooks/useWindowWidth.js";
 import ModalWrapper from "@/Components/ModalWrapper";
 import AddConges from "./AddConges";
 import EditConges from "./EditConges";
-import { MdOutlineDone, MdOutlineCancel } from "react-icons/md";
-import { RxCross2 } from "react-icons/rx";
-import ConfirmCongeAction from "@/Components/ConfirmCongeAction";
+import { MdOutlineCancel } from "react-icons/md";
 import ConfirmCongeAnnuler from "@/Components/ConfirmCongeAnnuler";
 
 export default function IndexPublic({ auth, conges,hasActiveContract, users, flash, employe }) {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -51,14 +52,34 @@ class Contract extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('statut', 'actif');
+        $today = Carbon::today();
+        return $query->where('date_debut', '<=', $today)
+                     ->where(function($q) use ($today) {
+                         $q->whereNull('date_fin')
+                           ->orWhere('date_fin', '>=', $today);
+                     });
     }
 
-    /**
-     * Scope a query to only include expired contracts.
-     */
+    // Scope pour les contrats expirés
     public function scopeExpired($query)
     {
-        return $query->where('statut', 'expire');
+        return $query->whereNotNull('date_fin')
+                     ->where('date_fin', '<', Carbon::today());
+    }
+
+    // Accessor pour le statut
+    public function getStatutAttribute()
+    {
+        $today = Carbon::today();
+        
+        if ($this->date_debut > $today) {
+            return 'future';
+        }
+        
+        if (is_null($this->date_fin) || $this->date_fin >= $today) {
+            return 'actif';
+        }
+        
+        return 'expire';
     }
 }

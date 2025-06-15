@@ -34,9 +34,9 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
 
     const filterRelations = {
         roles: {
-            all: ["user", "connecte", "contrat", "employe", "departements", "conges"],
-            admin: ["user", "connecte", "contrat", "employe", "departements", "conges"],
-            manager: ["user", "connecte", "contrat", "employe", "departements", "conges"],
+            all: ["user", "connecte", "contrat", "employe", "departements", "conges","salaire"],
+            admin: ["user", "connecte", "contrat", "employe", "departements", "conges","salaire"],
+            manager: ["user", "connecte", "contrat", "employe", "departements", "conges","salaire"],
             user: ["connecte", "conges"]
         },
         types: {
@@ -45,7 +45,8 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
             contrat: ["add", "delete", "update"],
             employe: ["add", "delete", "update","try-delete"],
             departements: ["add", "delete", "update","try-delete"],
-            conges: ["add", "delete", "update", "accept", "refuse"]
+            conges: ["add", "delete", "update", "accept", "refuse"],
+            salaire: ["effectuer","delete"]
         }
     };
 
@@ -190,7 +191,8 @@ export default function AlertIndex({ auth, alerts, users, documents, filters }) 
             'contrat': 'Contrat',
             'employe': 'Employé',
             'departements': 'Département',
-            'conges': 'Congé'
+            'conges': 'Congé',
+            'salaire':'salaire'
         };
         return typeLabels[typeValue] || typeValue;
     };

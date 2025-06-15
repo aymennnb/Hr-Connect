@@ -55,7 +55,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                 />
-                                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+                                {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
                             </div>
 
                             <div>
@@ -68,7 +68,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                 />
-                                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                                {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email}</p>}
                             </div>
 
                             <div>
@@ -81,7 +81,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.matricule}
                                     onChange={(e) => setData('matricule', e.target.value)}
                                 />
-                                {errors.matricule && <p className="text-red-500 text-xs mt-1">{errors.matricule}</p>}
+                                {errors.matricule && <p className="mt-2 text-sm text-red-600">{errors.matricule}</p>}
                             </div>
 
                             <div>
@@ -100,7 +100,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                         </option>
                                     ))}
                                 </select>
-                                {errors.departement_id && <p className="text-red-500 text-xs mt-1">{errors.departement_id}</p>}
+                                {errors.departement_id && <p className="mt-2 text-sm text-red-600">{errors.departement_id}</p>}
                             </div>
 
                             <div>
@@ -113,7 +113,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.poste}
                                     onChange={(e) => setData('poste', e.target.value)}
                                 />
-                                {errors.poste && <p className="text-red-500 text-xs mt-1">{errors.poste}</p>}
+                                {errors.poste && <p className="mt-2 text-sm text-red-600">{errors.poste}</p>}
                             </div>
 
                             <div>
@@ -126,7 +126,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.date_embauche}
                                     onChange={(e) => setData('date_embauche', e.target.value)}
                                 />
-                                {errors.date_embauche && <p className="text-red-500 text-xs mt-1">{errors.date_embauche}</p>}
+                                {errors.date_embauche && <p className="mt-2 text-sm text-red-600">{errors.date_embauche}</p>}
                             </div>
 
                             <div>
@@ -139,7 +139,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.telephone}
                                     onChange={(e) => setData('telephone', e.target.value)}
                                 />
-                                {errors.telephone && <p className="text-red-500 text-xs mt-1">{errors.telephone}</p>}
+                                {errors.telephone && <p className="mt-2 text-sm text-red-600">{errors.telephone}</p>}
                             </div>
 
                             <div>
@@ -152,7 +152,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     onChange={handleFileChange}
                                     accept="image/*"
                                 />
-                                {errors.photo && <p className="text-red-500 text-xs mt-1">{errors.photo}</p>}
+                                {errors.photo && <p className="mt-2 text-sm text-red-600">{errors.photo}</p>}
                             </div>
 
                             <div className="col-span-2 mt-4">
@@ -169,7 +169,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.adresse}
                                     onChange={(e) => setData('adresse', e.target.value)}
                                 />
-                                {errors.adresse && <p className="text-red-500 text-xs mt-1">{errors.adresse}</p>}
+                                {errors.adresse && <p className="mt-2 text-sm text-red-600">{errors.adresse}</p>}
                             </div>
 
                             <div>
@@ -182,7 +182,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.date_naissance}
                                     onChange={(e) => setData('date_naissance', e.target.value)}
                                 />
-                                {errors.date_naissance && <p className="text-red-500 text-xs mt-1">{errors.date_naissance}</p>}
+                                {errors.date_naissance && <p className="mt-2 text-sm text-red-600">{errors.date_naissance}</p>}
                             </div>
 
                             <div>
@@ -195,7 +195,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.ville}
                                     onChange={(e) => setData('ville', e.target.value)}
                                 />
-                                {errors.ville && <p className="text-red-500 text-xs mt-1">{errors.ville}</p>}
+                                {errors.ville && <p className="mt-2 text-sm text-red-600">{errors.ville}</p>}
                             </div>
 
                             <div>
@@ -213,7 +213,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     <option value="divorce">Divorcé{data.genre === "F" ? "e" : null}</option>
                                     <option value="veuf">Veu{data.genre === "F" ? "ve" : "f"}</option>
                                 </select>
-                                {errors.etat_civil && <p className="text-red-500 text-xs mt-1">{errors.etat_civil}</p>}
+                                {errors.etat_civil && <p className="mt-2 text-sm text-red-600">{errors.etat_civil}</p>}
                             </div>
 
                             <div>
@@ -229,7 +229,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     <option value="H">Homme</option>
                                     <option value="F">Femme</option>
                                 </select>
-                                {errors.genre && <p className="text-red-500 text-xs mt-1">{errors.genre}</p>}
+                                {errors.genre && <p className="mt-2 text-sm text-red-600">{errors.genre}</p>}
                             </div>
 
                             <div className="col-span-2 mt-4">
@@ -246,7 +246,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.cnss}
                                     onChange={(e) => setData('cnss', e.target.value)}
                                 />
-                                {errors.cnss && <p className="text-red-500 text-xs mt-1">{errors.cnss}</p>}
+                                {errors.cnss && <p className="mt-2 text-sm text-red-600">{errors.cnss}</p>}
                             </div>
 
                             <div>
@@ -259,7 +259,7 @@ function EditEmploye({ employe, setShowEditForm }) {
                                     value={data.cin}
                                     onChange={(e) => setData('cin', e.target.value)}
                                 />
-                                {errors.cin && <p className="text-red-500 text-xs mt-1">{errors.cin}</p>}
+                                {errors.cin && <p className="mt-2 text-sm text-red-600">{errors.cin}</p>}
                             </div>
                         </div>
 

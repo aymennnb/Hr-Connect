@@ -52,7 +52,7 @@ Route::middleware(['auth','verified'])->group(function () {
     });
 
     Route::prefix('salaires')->controller(SalaireController::class)->group(function () {
-                Route::get('/mes-slaires', 'indexPublic')->name('salaires.public');
+                Route::get('/mes-salaires', 'indexPublic')->name('salaires.public');
             });
 
     Route::middleware('CheckRole:manager,admin,superadmin')->group(function () {
@@ -131,6 +131,9 @@ Route::middleware(['auth','verified'])->group(function () {
 
             Route::prefix('salaires')->controller(SalaireController::class)->group(function () {
                 Route::get('/', 'index')->name('salaires');
+                Route::post('store', 'store')->name('salaires.store');
+                Route::put('update/{id}',  'update')->name('salaires.update');
+                Route::delete('delete/{id}',  'delete')->name('salaires.delete');   
             });
     });
 
