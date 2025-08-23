@@ -11,6 +11,7 @@ use App\Models\Documents;
 use App\Models\DocumentsAccess;
 use App\Models\Employe;
 use App\Models\Location;
+use App\Models\Salaire;
 use App\Models\Sites;
 use App\Models\Surface;
 use App\Models\User;
@@ -226,7 +227,6 @@ class SitesController extends Controller
     {
         $user = Auth::user();
 
-        // Données communes
         $users = User::all();
         $alerts = Alerts::all();
         $totalEmployees = Employe::count();
@@ -242,7 +242,6 @@ class SitesController extends Controller
             $documents = Documents::whereIn('id', $accessibleDocumentIds)->get();
         }
 
-        // 🎯 Appliquer le même filtrage pour les congés :
         if ($user->role === 'superadmin') {
             $filteredConges = Conge::query();
         } elseif ($user->role === 'admin') {
@@ -254,24 +253,23 @@ class SitesController extends Controller
                 $query->where('role', 'user');
             });
         } else {
-            $filteredConges = Conge::whereNull('id'); // Aucun congé pour les autres
+            $filteredConges = Conge::whereNull('id');
         }
 
-        // 🔢 Nombre total filtré
         $leaveRequestsCount = (clone $filteredConges)->count();
 
-        // 📊 Regroupement par statut
         $leaveRequestsByStatus = (clone $filteredConges)
             ->select('status', \DB::raw('count(*) as total'))
             ->groupBy('status')
             ->get();
 
-        // Employés par département
+        $totalSalaire = Salaire::sum('salaire_base');
+
         $employeesByDepartment = Departement::withCount('employes')->get()->map(function ($dept) {
             return [
                 'departement_id' => $dept->id,
                 'departement_name' => $dept->name,
-                'employees_count' => $dept->employes_count,
+                'employees_count' => $dept->employes_count
             ];
         });
 
@@ -288,7 +286,8 @@ class SitesController extends Controller
             'employeesByDepartment' => $employeesByDepartment,
             'leaveRequestsByStatus' => $leaveRequestsByStatus,
             'employe' => $employe,
-            'contrats' => $employe ? $employe->contrats : []
+            'contrats' => $employe ? $employe->contrats : [],
+            'totalSalaire'=>$totalSalaire
         ]);
     }
 

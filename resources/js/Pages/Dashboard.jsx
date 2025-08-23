@@ -68,7 +68,8 @@ export default function Dashboard({
   alerts,
   users,
   employe,
-  contrats
+  contrats,
+  totalSalaire
 }) {
   // Formatage des données pour les tableaux
   const employeesByDeptData = employeesByDepartment.map(dept => [
@@ -374,7 +375,7 @@ const recentActivitiesData = alerts
             />
             <StatsCard
               title="Masse salariale"
-              value="0 DH"
+              value={totalSalaire}
               bgColor="bg-purple-500"
               icon={
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
