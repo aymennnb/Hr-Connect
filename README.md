@@ -82,10 +82,15 @@ php artisan serve
 ## 📸 Aperçu
 
 ![Screenshot du jeu](Screenshot1.png)
+
 ![Screenshot du jeu](Screenshot2.png)
+
 ![Screenshot du jeu](Screenshot3.png)
+
 ![Screenshot du jeu](Screenshot4.png)
+
 ![Screenshot du jeu](Screenshot5.png)
+
 ![Screenshot du jeu](Screenshot6.png)
 
 👨‍💻 **Auteur**  
